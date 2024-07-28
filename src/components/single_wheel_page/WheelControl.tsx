@@ -1,0 +1,213 @@
+
+import React, { useEffect, useCallback, useState, useRef } from 'react';
+import { useParams } from 'react-router-dom';
+import { useWheel } from '../context/useWheel';
+import ValuesControl from './ValuesControl';
+import AddValueForm from './AddValueForm';
+import PortalContainer from './PortalContainer';
+import WheelComponent from '../wheel/WheelComponent';
+import { Toaster } from 'react-hot-toast'
+import { SiStarship } from 'react-icons/si'
+import { motion } from 'framer-motion'
+import { Input } from '../Input'
+
+import { FaRegEdit } from 'react-icons/fa'
+import { RiDeleteBin7Line } from 'react-icons/ri'
+import { toast } from 'react-hot-toast'
+import cn from 'classnames'
+import { Switch, Group } from '@mantine/core';
+import classes from './CustomSwitch.module.css';
+
+const WheelControl: React.FC = () => {
+    const { id } = useParams<{ id: string }>();
+    const { oneWheel, loading, getOneWheel, updateWheel, updateValue, deleteValue, triggerSpinAnimation, random, oneCycle, landedValues, clearLandedValues } = useWheel();
+    const [refresh, setRefresh] = useState(0);
+    const [isPortalOpen, setIsPortalOpen] = useState(false);
+    const [isTriggerDisabled, setIsTriggerDisabled] = useState(false);
+ 
+
+    const [editingWheelId, setEditingWheelId] = useState<string| null>(null);
+    //holds edited value
+    const [editedWheel, setEditedWheel] = useState<string>('');
+    // console.log(oneWheel)
+    const editInputRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        getOneWheel(String(id));
+    }, [id, getOneWheel, refresh]);
+
+    useEffect(() => {
+        if(oneWheel && landedValues[oneWheel.id]?.length === oneWheel.values.length) {
+            setIsTriggerDisabled(true);
+        }else {
+            setIsTriggerDisabled(false);
+        }
+    }, [landedValues, oneWheel]);
+
+    const refreshWheelData = useCallback(() => {
+        setRefresh(prev => prev + 1);
+    }, []);
+
+    const handleOpenPortal = () => {
+        setIsPortalOpen(true);
+    };
+
+    const handleClosePortal = () => {
+        setIsPortalOpen(false);
+    };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!oneWheel) {
+        return <div>Wheel not found</div>;
+    }
+
+
+    const handleEditStart = (wheelId: string, originalValue: string) => {
+        setEditingWheelId(wheelId);
+        setEditedWheel(originalValue);
+
+        if (editInputRef.current) {
+            editInputRef.current.focus()
+        }
+
+    };
+
+    const handleUpdate = ( wheelId: string) => {
+        if (editedWheel.trim() !== '') {
+            updateWheel(wheelId, editedWheel)
+            refreshWheelData();
+
+            //reset state
+            setEditingWheelId(null);
+            setEditedWheel('');
+            toast.success('Todo updated successfully!')
+        } else {
+            toast.error('Todo field cannot be empty!')
+        }
+    }
+
+  
+
+
+    return (
+        <>
+         <Toaster position="bottom-center" />
+
+
+<motion.h1
+                className="p-5 rounded-xl bg-zinc-900"
+                key={oneWheel?.id}
+            >
+                {editingWheelId === oneWheel?.id ? (
+                    <motion.div
+                        layout
+                        key={oneWheel?.id}
+                        className="flex gap-2"
+                    >
+                        <Input
+                            ref={editInputRef}
+                            type="text"
+                            value={editedWheel}
+                            onChange={e => setEditedWheel(e.target.value)}
+                        />
+                        <button
+                            className="px-5 py-2 text-sm font-normal text-orange-300 bg-orange-900 border-2 border-orange-900 active:scale-95 rounded-xl"
+                            onClick={() => handleUpdate(oneWheel.id)}
+                        >
+                            Save
+                        </button>
+                    </motion.div>
+                ) : (
+                    <div className="flex flex-col gap-5">
+                        <motion.span layout>
+                            <span>{oneWheel?.title}</span>
+                        </motion.span>
+                        <div className="flex justify-between gap-5 text-white">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => handleEditStart(oneWheel.id, oneWheel.title)}
+                                    className="flex items-center gap-1"
+                                >
+                                    <FaRegEdit />
+                                    Edit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </motion.h1>
+
+
+
+           
+            <AddValueForm wheel_id={String(id)} onValueAdded={refreshWheelData} />
+            {oneWheel.values && oneWheel.values.length > 0 ? (
+                <>
+                    <ValuesControl
+                        wheel={oneWheel}
+                        onUpdateValue={(wheelId, valueId, value) => {
+                            updateValue(wheelId, valueId, value);
+                            refreshWheelData();
+                        }}
+                        onValueChanged={refreshWheelData}
+                        deleteValue={(wheelId, valueId) => {
+                            deleteValue(wheelId, valueId).then(refreshWheelData);
+                        }}
+                    />
+
+                    <button onClick={triggerSpinAnimation} disabled={isTriggerDisabled}>
+                        Trigger Animation
+                        </button>
+                </>
+            ) : (
+
+                <div className="max-w-lg px-5 m-auto">
+                    <h1 className="flex flex-col items-center gap-5 px-5 py-10 text-xl font-bold text-center rounded-xl bg-zinc-900">
+                        <SiStarship className="text-5xl" />
+                        add values to  your wheel
+                    </h1>
+                </div>
+            )
+            }
+ <Group justify="center" p="md">
+      <Switch 
+      label="Random" classNames={classes} 
+      onClick={random}
+      />
+    </Group>
+    <Group justify="center" p="md">
+      <Switch 
+      label="Cycle once" classNames={classes} 
+      onClick={oneCycle}
+      />
+    </Group>
+
+            <button onClick={handleOpenPortal}>Open Portal</button>
+            <button onClick={handleClosePortal}>Close Portal</button>
+            {isPortalOpen && (
+                <PortalContainer >
+                    <WheelComponent />
+                </PortalContainer>
+            )}
+
+            <WheelComponent />
+
+        </>
+    );
+};
+
+export default WheelControl;
+
+
+
+
+
+
+
+
+
+
+
