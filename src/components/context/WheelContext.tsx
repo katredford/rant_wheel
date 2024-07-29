@@ -23,8 +23,8 @@ interface WheelContextType {
     spinAnimationTriggered: boolean;
     randomState: boolean
     random: () => void;
-    oneCycle: () => void;
-    oneCycleState: boolean;
+    cycleOnce: () => void;
+   cycleOnceState: boolean;
     landedValues: { [key: string]: Value[] }; // Track landed values by wheel ID
     addLandedValue: (wheel_id: string, value: Value) => void;
     clearLandedValues: (wheel_id: string) => void;
@@ -46,8 +46,8 @@ export const WheelContext = createContext<WheelContextType>({
     spinAnimationTriggered: false,
     randomState: false,
     random: () => {},
-   oneCycle: () => {},
-   oneCycleState: false,
+   cycleOnce: () => {},
+   cycleOnceState: false,
    landedValues: {},
    addLandedValue: () => {},
    clearLandedValues: () => {},
@@ -61,21 +61,12 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [loading, setLoading] = useState(false);
     const [spinAnimationTriggered, setSpinAnimationTriggered] = useState(false);
     const[randomState, setRandomState] = useState(false);
-    const[oneCycleState, setOneCycleState] = useState(false);
+    const[cycleOnceState, setCycleOnceState] = useState(false);
     const [landedValues, setLandedValues] = useState<{ [key: string]: Value[] }>({});
   
 
 
-    // useEffect(() => {
-    //     const storedWheels = localStorage.getItem('wheels');
-    //     const wheels = storedWheels? JSON.parse(storedWheels) : [];
-    //     setWheels(wheels);
-    //     setLoading(false);
-    // }, []);
 
-    // useEffect(() => {
-    //     localStorage.setItem('wheels', JSON.stringify(wheels));
-    // }, [wheels]);
 
     useEffect(() => {
         const storedWheels = localStorage.getItem('wheels');
@@ -88,7 +79,7 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     useEffect(() => {
         console.log('useEffect - Saving wheels to localStorage:', wheels);
         localStorage.setItem('wheels', JSON.stringify(wheels));
-    }, [wheels, randomState, oneCycleState]);
+    }, [wheels, randomState, cycleOnceState]);
 
     //useCallback is to memoize
     // memoization is the process of caching the result of a function call and 
@@ -137,27 +128,7 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 
 
-    // const addWheel = useCallback((inputValue: string) => {
-    //     try {
-    //         // retrieve existing wheels from localStorage
-    //         const storedWheels = localStorage.getItem('wheels');
-    //         const wheels = storedWheels ? JSON.parse(storedWheels) : [];
-    
-    //         // create a new wheel object
-    //         const newWheel = { id: uuidv4(), title: inputValue, values: [], isRandom: false, cycleOnce: false };
-    
-    //         // add the new wheel to the list of wheels
-    //         const updatedWheels = [...wheels, newWheel];
-    
-    //         // save the updated wheels list back to localStorage
-    //         localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-    
-    //         // update the state with the new wheels list
-    //         setWheels(updatedWheels);
-    //     } catch (error) {
-    //         console.error('There is an error adding the wheel title');
-    //     }
-    // }, []);
+
 
 
     const addWheel = useCallback((inputValue: string) => {
@@ -174,28 +145,7 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         }
     }, []);
 
-// const addValue = useCallback((wheel_id: string, value: string) => {
-//     try {
-//         // Retrieve wheels from localStorage
-//         const storedWheels = localStorage.getItem('wheels');
-//         const wheels: Wheel[] = storedWheels ? JSON.parse(storedWheels) : [];
 
-//         // Create a new value
-//         const newValue: Value = { id: uuidv4(), value, wheel_id };
-
-//         // Find the wheel to update and add the new value
-//         const updatedWheels = wheels.map(wheel => 
-//             wheel.id === wheel_id 
-//                 ? { ...wheel, values: [...wheel.values, newValue] } 
-//                 : wheel
-//         );
-
-//         // Save the updated wheels list back to localStorage
-//         localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-//     } catch (error) {
-//         console.error("Error adding value:", error);
-//     }
-// }, []);
 
 const addValue = useCallback((wheel_id: string, value: string) => {
     try {
@@ -213,45 +163,23 @@ const addValue = useCallback((wheel_id: string, value: string) => {
     }
 }, []);
 
-// const updateWheel = useCallback((wheel_id: string, title: string) => {
-//     try{
-//     const storedWheels = localStorage.getItem("wheels");
-//     const wheels: Wheel[] = storedWheels ? JSON.parse(storedWheels) : [];
 
-//     const updatedWheels = wheels.map(wheel => {
-//         wheel.id === wheel_id ? {...wheel, title, } : wheel
-//     });
-
-//     localStorage.setItem('wheels', JSON.stringify(updatedWheels))
-    
-// } catch (error) {
-//     console.error("Error updating wheel titles:", error);
-// }
-// }, []);
-
-const updateWheel = useCallback((wheel_id: string, title: string) => {
+console.log("ROOOOOOOOOO", randomState)
+const updateWheel = useCallback((wheel_id: string, title: string, updates: Partial<Wheel>) => {
     try {
-        // Retrieve wheels from localStorage
         const storedWheels = localStorage.getItem('wheels');
         const wheels: Wheel[] = storedWheels ? JSON.parse(storedWheels) : [];
 
-        // Update the wheel with the new title and randomState
-        const updatedWheels = wheels.map(wheel => {
-            if (wheel.id === wheel_id) {
-                return { ...wheel, title, isRandom: randomState, oneCycle: oneCycleState }; // Update the wheel with randomState
-            }
-            return wheel;
-        });
+        const updatedWheels = wheels.map(wheel => 
+            wheel.id === wheel_id ? { ...wheel, title, ...updates } : wheel
+        );
 
-        // Save the updated wheels list back to localStorage
         setWheels(updatedWheels);
         localStorage.setItem('wheels', JSON.stringify(updatedWheels));
     } catch (error) {
         console.error("Error updating wheel:", error);
     }
-}, [randomState]);
-console.log("ROOOOOOOOOO", randomState)
-
+}, []);
 
 
 
@@ -272,9 +200,10 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
             }
             return wheel;
         });
-
+        console.log("UDATGE UPDATE UPDATE", updatedWheels)
         // Save the updated wheels list back to localStorage
-        localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+        // localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+        setWheels(updatedWheels);
     } catch (error) {
         console.error("Error updating value:", error);
     }
@@ -316,35 +245,36 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
         setTimeout(() => setSpinAnimationTriggered(false), 1000);
     }, []);
 
-    // const random = useCallback(() => {
-      
-    //     setRandomState(prevState => !prevState);
-       
-    // }, []);
 
-    const random = useCallback(() => {
-        setRandomState(prevState => !prevState);
+
+
+const random = useCallback(() => {
+    setRandomState(prevState => {
+        const newState = !prevState;
         setWheels(prevWheels => {
             const updatedWheels = prevWheels.map(wheel => ({
                 ...wheel,
-                isRandom: !randomState,
+                isRandom: newState,
             }));
-            console.log('Random state toggled. Updated wheels:', updatedWheels);
             return updatedWheels;
         });
-    }, [randomState]);
-    
-    const oneCycle = useCallback(() => {
-        setOneCycleState(prevState => !prevState);
+        return newState;
+    });
+}, []);
+
+const cycleOnce = useCallback(() => {
+    setCycleOnceState(prevState => {
+        const newState = !prevState;
         setWheels(prevWheels => {
             const updatedWheels = prevWheels.map(wheel => ({
                 ...wheel,
-                oneCycle: !oneCycleState,
-            }))
-            console.log("one cycle toggled updated wheels")
-            return updatedWheels
-        })
-    }, [])
+                cycleOnce: newState,
+            }));
+            return updatedWheels;
+        });
+        return newState;
+    });
+}, []);
 
     const addLandedValue = useCallback((wheel_id: string, value: Value) => {
         setLandedValues(prevState => ({
@@ -383,8 +313,8 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
         triggerSpinAnimation,
         random,
         randomState,
-        oneCycle,
-        oneCycleState,
+        cycleOnce,
+        cycleOnceState,
         landedValues,
         addLandedValue,
         clearLandedValues,

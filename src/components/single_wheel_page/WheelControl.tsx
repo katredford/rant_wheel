@@ -20,11 +20,11 @@ import classes from './CustomSwitch.module.css';
 
 const WheelControl: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { oneWheel, loading, getOneWheel, updateWheel, updateValue, deleteValue, triggerSpinAnimation, random, oneCycle, landedValues, clearLandedValues } = useWheel();
+    const { oneWheel, loading, getOneWheel, updateWheel, updateValue, deleteValue, triggerSpinAnimation, random, cycleOnce, landedValues, clearLandedValues } = useWheel();
     const [refresh, setRefresh] = useState(0);
     const [isPortalOpen, setIsPortalOpen] = useState(false);
     const [isTriggerDisabled, setIsTriggerDisabled] = useState(false);
- 
+ console.log("WHEELCONTROL", oneWheel)
 
     const [editingWheelId, setEditingWheelId] = useState<string| null>(null);
     //holds edited value
@@ -89,9 +89,15 @@ const WheelControl: React.FC = () => {
         }
     }
 
-  
 
 
+    const handleSwitchChange = (type: 'random' | 'cycleOnce', checked: boolean) => {
+        if (type === 'random') {
+            updateWheel(oneWheel.id, oneWheel.title, { ...oneWheel, isRandom: checked });
+        } else if (type === 'cycleOnce') {
+            updateWheel(oneWheel.id, oneWheel.title, { ...oneWheel, cycleOnce: checked });
+        }
+    };
     return (
         <>
          <Toaster position="bottom-center" />
@@ -172,18 +178,21 @@ const WheelControl: React.FC = () => {
                 </div>
             )
             }
- <Group justify="center" p="md">
-      <Switch 
-      label="Random" classNames={classes} 
-      onClick={random}
-      />
-    </Group>
-    <Group justify="center" p="md">
-      <Switch 
-      label="Cycle once" classNames={classes} 
-      onClick={oneCycle}
-      />
-    </Group>
+
+
+
+            <Switch
+    label="Random"
+    classNames={classes}
+    checked={oneWheel.isRandom || false}
+    onChange={(e) => handleSwitchChange('random', e.currentTarget.checked)}
+/>
+<Switch
+    label="Cycle once"
+    classNames={classes}
+    checked={oneWheel.cycleOnce || false}
+    onChange={(e) => handleSwitchChange('cycleOnce', e.currentTarget.checked)}
+/>
 
             <button onClick={handleOpenPortal}>Open Portal</button>
             <button onClick={handleClosePortal}>Close Portal</button>

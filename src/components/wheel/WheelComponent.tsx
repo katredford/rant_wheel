@@ -6,8 +6,8 @@ import { useWheel } from '../context/useWheel';
 
 
 const WheelComponent: FC = () => {
-    const { oneWheel, loading, spinAnimationTriggered,  randomState, oneCycleState, landedValues, addLandedValue } = useWheel();
-    console.log("component wheel", oneCycleState)
+    const { oneWheel, loading, spinAnimationTriggered,  randomState, cycleOnceState, landedValues, addLandedValue } = useWheel();
+    console.log("component wheel", cycleOnceState)
     const [isSpinning, setIsSpinning] = useState(false);
     const [wheelPos, setWheelPos] = useState(0);
     const [speed, setSpeed] = useState(0);
@@ -112,38 +112,7 @@ const WheelComponent: FC = () => {
 
 
 
-    // const handleSpinClick = () => {
-    //     setIsSpinning(true);
-    //     const currentTime = performance.now();
-    //     setStartTime(currentTime);
-    //     setEndTime(currentTime + spinTime);
 
-    //     const slices = oneWheel?.values.length || 1;
-    //     const sliceAngle = (2 * Math.PI) / slices;
-        
-    //     let targetSlice;
-    //     if (randomState) {
-    //         targetSlice = Math.floor(Math.random() * slices);
-    //     } else {
-    //         targetSlice = (lastIndex + 1) % slices;
-    //         // targetSlice = (lastIndex + 1) % values.length;
-    //         setLastIndex(targetSlice);
-    //     }
-
-    //     const targetSliceCenter = targetSlice * sliceAngle + sliceAngle / 2;
-    //     const currentWheelRotation = wheelPos % (2 * Math.PI);
-    //     const newEndPos = wheelPos + minSpins - currentWheelRotation + targetSliceCenter;
-    //     setEndPos(newEndPos);
-
-    // if (oneCycleState && oneWheel) {
-    //     const landedValue = oneWheel.values[targetSlice];
-    //     if (!landedValues[oneWheel.id]?.some(value => value.id === landedValue.id)) {
-    //         addLandedValue(oneWheel.id, landedValue);
-    //     }
-    // }
-
- 
-        
     // };
 
     const handleSpinClick = () => {
@@ -158,8 +127,8 @@ const WheelComponent: FC = () => {
         let targetSlice;
     
         // Determine the target slice
-        if (randomState && oneCycleState) {
-            // If both random and oneCycle are true
+        if (randomState && cycleOnceState) {
+            // If both random and cycleOnce are true
             let remainingSlices = oneWheel.values.filter(
                 (value) => !landedValues[oneWheel.id]?.some((landedValue) => landedValue.id === value.id)
             );
@@ -186,8 +155,8 @@ const WheelComponent: FC = () => {
         const newEndPos = wheelPos + minSpins - currentWheelRotation + targetSliceCenter;
         setEndPos(newEndPos);
     
-        // Handle landed values for oneCycleState
-        if (oneCycleState && oneWheel) {
+        // Handle landed values for cycleOnceState
+        if (cycleOnceState && oneWheel) {
             const landedValue = oneWheel.values[targetSlice];
             if (!landedValues[oneWheel.id]?.some(value => value.id === landedValue.id)) {
                 addLandedValue(oneWheel.id, landedValue);
