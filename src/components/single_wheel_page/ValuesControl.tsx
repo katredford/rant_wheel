@@ -12,11 +12,13 @@ import { Wheel, Value } from '../context/types';
 interface ValuesControlProps {
     wheel?: Wheel;
     onUpdateValue: (wheel_id: string, value_id: string, new_value: string) => void;
-    onValueChanged: () => void;
+    // onValueChanged: () => void;
     deleteValue: (wheel_id: string, value_id: string) => void;
 }
 
-const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, onValueChanged, deleteValue }) => {
+const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, 
+    // onValueChanged,
+     deleteValue }) => {
     const [editingValueId, setEditingValueId] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
     const [values, setValues] = useState<Value[]>([]);
@@ -58,7 +60,7 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, onV
     const handleUpdate = (valueId: string, wheelId: string) => {
         if (editedValue.trim() !== '') {
             onUpdateValue(wheelId, valueId, editedValue);
-            onValueChanged();
+            // onValueChanged();
             setEditingValueId(null);
             setEditedValue('');
             toast.success('Value updated successfully!');
@@ -69,7 +71,7 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, onV
 
     const handleDelete = (wheelId: string, valueId: string) => {
         deleteValue(wheelId, valueId);
-        onValueChanged();
+        // onValueChanged();
         toast.success('Value deleted successfully!');
     };
 

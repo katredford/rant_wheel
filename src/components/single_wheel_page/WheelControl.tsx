@@ -17,24 +17,51 @@ import { toast } from 'react-hot-toast'
 import cn from 'classnames'
 import { Switch, Group } from '@mantine/core';
 import classes from './CustomSwitch.module.css';
+import useLocalStorageListener from '../hooks/useLocalStorageListener';
+
 
 const WheelControl: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { oneWheel, loading, getOneWheel, updateWheel, updateValue, deleteValue, triggerSpinAnimation, random, cycleOnce, landedValues, clearLandedValues } = useWheel();
-    const [refresh, setRefresh] = useState(0);
+    const { 
+        oneWheel, 
+        loading, 
+        getOneWheel, 
+        updateWheel, 
+        updateValue, 
+        deleteValue, 
+        triggerSpinAnimation, 
+        landedValues, 
+        clearLandedValues, 
+        refreshTrigger
+    } = useWheel();
+
     const [isPortalOpen, setIsPortalOpen] = useState(false);
     const [isTriggerDisabled, setIsTriggerDisabled] = useState(false);
- console.log("WHEELCONTROL", oneWheel)
+
 
     const [editingWheelId, setEditingWheelId] = useState<string| null>(null);
     //holds edited value
     const [editedWheel, setEditedWheel] = useState<string>('');
-    // console.log(oneWheel)
+   
     const editInputRef = useRef<HTMLInputElement>(null)
+    const refreshWheelData = () => {
+   
+        getOneWheel(String(id));
+    };
+
+    // Listen for changes to the specific wheel in local storage
+  
+    useEffect(() => {
+        // This effect will run whenever refreshTrigger changes
+     
+    
+        // Add any logic needed to refresh the WheelControl component here
+        getOneWheel(String(id));
+    }, [refreshTrigger, id, getOneWheel]);
 
     useEffect(() => {
         getOneWheel(String(id));
-    }, [id, getOneWheel, refresh]);
+    }, [id, getOneWheel]);
 
     useEffect(() => {
         if(oneWheel && landedValues[oneWheel.id]?.length === oneWheel.values.length) {
@@ -44,9 +71,7 @@ const WheelControl: React.FC = () => {
         }
     }, [landedValues, oneWheel]);
 
-    const refreshWheelData = useCallback(() => {
-        setRefresh(prev => prev + 1);
-    }, []);
+   
 
     const handleOpenPortal = () => {
         setIsPortalOpen(true);

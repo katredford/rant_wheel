@@ -10,6 +10,6 @@ export interface Wheel {
     createdAt: string;
     updatedAt: string;
     values: Value[];
-    isRandome: boolean;
+    isRandom: boolean;
     cycleOnce: boolean;
 }

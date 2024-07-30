@@ -1,5 +1,5 @@
 // WheelProvider.tsx
-import React, { createContext, useState, useEffect, ReactNode, useCallback, useReducer } from 'react';
+import React, { createContext, useState, useEffect, ReactNode, useCallback, useRef } from 'react';
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 // import { useParams } from 'react-router-dom';
@@ -21,13 +21,11 @@ interface WheelContextType {
     deleteValue: (wheel_id: string, value_id: string) => Promise<void>;
     triggerSpinAnimation: () => void;
     spinAnimationTriggered: boolean;
-    randomState: boolean
-    random: () => void;
-    cycleOnce: () => void;
-   cycleOnceState: boolean;
     landedValues: { [key: string]: Value[] }; // Track landed values by wheel ID
     addLandedValue: (wheel_id: string, value: Value) => void;
     clearLandedValues: (wheel_id: string) => void;
+    refreshWheelData: () => void;
+    refreshTrigger: boolean;
 
 }
 
@@ -44,13 +42,12 @@ export const WheelContext = createContext<WheelContextType>({
     deleteValue: async () => {},
     triggerSpinAnimation: () => {},
     spinAnimationTriggered: false,
-    randomState: false,
-    random: () => {},
-   cycleOnce: () => {},
-   cycleOnceState: false,
+
    landedValues: {},
    addLandedValue: () => {},
    clearLandedValues: () => {},
+   refreshWheelData: () => {},
+   refreshTrigger: false,
     // newValues: state.values,
 });
 
@@ -60,26 +57,33 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     const [oneWheel, setOneWheel] = useState<Wheel | null>(null);
     const [loading, setLoading] = useState(false);
     const [spinAnimationTriggered, setSpinAnimationTriggered] = useState(false);
-    const[randomState, setRandomState] = useState(false);
-    const[cycleOnceState, setCycleOnceState] = useState(false);
+
     const [landedValues, setLandedValues] = useState<{ [key: string]: Value[] }>({});
+
+ 
+    const prevOneWheelRef = useRef<Wheel | null>(null);
+
+    const [refreshTrigger, setRefreshTrigger] = useState(false); // Add this line
+
+    const refreshWheelData = useCallback(() => {
   
-
-
-
+        setRefreshTrigger(prev => !prev); // Toggle the refreshTrigger state
+    }, []);
+   
 
     useEffect(() => {
         const storedWheels = localStorage.getItem('wheels');
         const wheels = storedWheels ? JSON.parse(storedWheels) : [];
-        console.log('useEffect - Load wheels from localStorage:', wheels);
+    
         setWheels(wheels);
         setLoading(false);
     }, []);
 
     useEffect(() => {
-        console.log('useEffect - Saving wheels to localStorage:', wheels);
+       
         localStorage.setItem('wheels', JSON.stringify(wheels));
-    }, [wheels, randomState, cycleOnceState]);
+        refreshWheelData()
+    }, [wheels]);
 
     //useCallback is to memoize
     // memoization is the process of caching the result of a function call and 
@@ -136,8 +140,8 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const newWheel = { id: uuidv4(), title: inputValue, values: [], isRandom: false, cycleOnce: false };
             setWheels(prevWheels => {
                 const updatedWheels = [...prevWheels, newWheel];
-                console.log('Adding wheel:', newWheel);
-                console.log('Updated wheels:', updatedWheels);
+                // console.log('Adding wheel:', newWheel);
+                // console.log('Updated wheels:', updatedWheels);
                 return updatedWheels;
             });
         } catch (error) {
@@ -154,8 +158,8 @@ const addValue = useCallback((wheel_id: string, value: string) => {
             const updatedWheels = prevWheels.map(wheel =>
                 wheel.id === wheel_id ? { ...wheel, values: [...wheel.values, newValue] } : wheel
             );
-            console.log('Adding value:', newValue);
-            console.log('Updated wheels:', updatedWheels);
+            // console.log('Adding value:', newValue);
+            // console.log('Updated wheels:', updatedWheels);
             return updatedWheels;
         });
     } catch (error) {
@@ -164,7 +168,7 @@ const addValue = useCallback((wheel_id: string, value: string) => {
 }, []);
 
 
-console.log("ROOOOOOOOOO", randomState)
+
 const updateWheel = useCallback((wheel_id: string, title: string, updates: Partial<Wheel>) => {
     try {
         const storedWheels = localStorage.getItem('wheels');
@@ -200,7 +204,7 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
             }
             return wheel;
         });
-        console.log("UDATGE UPDATE UPDATE", updatedWheels)
+   
         // Save the updated wheels list back to localStorage
         // localStorage.setItem('wheels', JSON.stringify(updatedWheels));
         setWheels(updatedWheels);
@@ -248,33 +252,7 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
 
 
 
-const random = useCallback(() => {
-    setRandomState(prevState => {
-        const newState = !prevState;
-        setWheels(prevWheels => {
-            const updatedWheels = prevWheels.map(wheel => ({
-                ...wheel,
-                isRandom: newState,
-            }));
-            return updatedWheels;
-        });
-        return newState;
-    });
-}, []);
 
-const cycleOnce = useCallback(() => {
-    setCycleOnceState(prevState => {
-        const newState = !prevState;
-        setWheels(prevWheels => {
-            const updatedWheels = prevWheels.map(wheel => ({
-                ...wheel,
-                cycleOnce: newState,
-            }));
-            return updatedWheels;
-        });
-        return newState;
-    });
-}, []);
 
     const addLandedValue = useCallback((wheel_id: string, value: Value) => {
         setLandedValues(prevState => ({
@@ -283,7 +261,7 @@ const cycleOnce = useCallback(() => {
         }));
     }, []);
 
-    console.log("add landed values", landedValues)
+   
     const clearLandedValues = useCallback((wheel_id: string) => {
         setLandedValues(prevState => ({
             ...prevState,
@@ -311,13 +289,12 @@ const cycleOnce = useCallback(() => {
         deleteValue,
         spinAnimationTriggered,
         triggerSpinAnimation,
-        random,
-        randomState,
-        cycleOnce,
-        cycleOnceState,
         landedValues,
         addLandedValue,
         clearLandedValues,
+        refreshWheelData,
+        refreshTrigger,
+    //     refresh
     }
 
     return (

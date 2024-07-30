@@ -6,8 +6,8 @@ import { useWheel } from '../context/useWheel';
 
 
 const WheelComponent: FC = () => {
-    const { oneWheel, loading, spinAnimationTriggered,  randomState, cycleOnceState, landedValues, addLandedValue } = useWheel();
-    console.log("component wheel", cycleOnceState)
+    const { oneWheel, loading, spinAnimationTriggered,   landedValues, addLandedValue } = useWheel();
+
     const [isSpinning, setIsSpinning] = useState(false);
     const [wheelPos, setWheelPos] = useState(0);
     const [speed, setSpeed] = useState(0);
@@ -127,7 +127,7 @@ const WheelComponent: FC = () => {
         let targetSlice;
     
         // Determine the target slice
-        if (randomState && cycleOnceState) {
+        if (oneWheel?.isRandom && oneWheel?.cycleOnce) {
             // If both random and cycleOnce are true
             let remainingSlices = oneWheel.values.filter(
                 (value) => !landedValues[oneWheel.id]?.some((landedValue) => landedValue.id === value.id)
@@ -141,7 +141,7 @@ const WheelComponent: FC = () => {
             const randomIndex = Math.floor(Math.random() * remainingSlices.length);
             const selectedValue = remainingSlices[randomIndex];
             targetSlice = oneWheel.values.findIndex((value) => value.id === selectedValue.id);
-        } else if (randomState) {
+        } else if (oneWheel?.isRandom) {
             // If only random is true
             targetSlice = Math.floor(Math.random() * slices);
         } else {
@@ -156,7 +156,7 @@ const WheelComponent: FC = () => {
         setEndPos(newEndPos);
     
         // Handle landed values for cycleOnceState
-        if (cycleOnceState && oneWheel) {
+        if (oneWheel?.cycleOnce && oneWheel) {
             const landedValue = oneWheel.values[targetSlice];
             if (!landedValues[oneWheel.id]?.some(value => value.id === landedValue.id)) {
                 addLandedValue(oneWheel.id, landedValue);
