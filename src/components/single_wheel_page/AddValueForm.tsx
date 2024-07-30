@@ -6,15 +6,10 @@ import { Input } from '../Input'
 
 interface AddValueFormProps {
     wheel_id: string;
-    // onValueadded: It is called within handleSubmit after a new value has 
-    // been successfully added to the wheel. The primary purpose of this callback
-    // is to allow the parent component to react to the addition of a new value
-//     onValueAdded: () => void; // new prop for callback
+
 }
 
-const AddValueForm: React.FC<AddValueFormProps> = ({ wheel_id, 
-    // onValueAdded
- }) => {
+const AddValueForm: React.FC<AddValueFormProps> = ({ wheel_id }) => {
     const { addValue } = useWheel();
     const [inputValue, setInputValue] = useState<string>('')
     const inputRef = useRef<HTMLInputElement>(null)

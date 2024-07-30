@@ -272,9 +272,6 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
 
   
 
-    // useEffect(() => {
-    //     getAllWheels();
-    // }, [getAllWheels]);
 
 
     const actions = {
