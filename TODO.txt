@@ -1,0 +1,10 @@
+Why does the order the wheel lands not start at the beginning of the values arraY?
+
+
+clear feild after
+Add colors
+add pictures - cloudinary
+add middle pointer -cloudinary?
+
+export settings JSON
+import settings JSON

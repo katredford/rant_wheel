@@ -1,33 +1,48 @@
 
+//forwardRef is a React fuction that allows you to forward refs to 
+//the underlying DOM element or component
+
+//useState a react hook that lest you add state to your functional component
+
+//TextInput a pre-styled component form mantine
+
+//cn from the classnames library that helps conditionaly join class names together
 import { forwardRef, useState } from 'react';
 import { TextInput } from '@mantine/core';
 import cn from 'classnames';
 
+//forwardRef wraps the input component to forward the 'ref' to the TextInput component.
 export const Input = forwardRef<
-  HTMLInputElement,
-  React.ComponentProps<typeof TextInput> // Use Mantine TextInput props
->(({ className, ...rest }, ref) => {
+//these are the types for the forwarded ref props
+  HTMLInputElement, // type of ref being forwarded
+  React.ComponentProps<typeof TextInput> // type of props the textInput accepts
+>(({ className, value, onChange, ...rest }, ref) => {
   const [focused, setFocused] = useState(false);
-  const [value, setValue] = useState('');
-  const floating = value.trim().length !== 0 || focused || undefined;
+
+  //determins if the label should be floating based on wheter the input has value or is focused
+  const floating = value?.toString().trim().length !== 0 || focused || undefined;
 
   return (
     <TextInput
       {...rest}
       ref={ref}
-      classNames={{ input: cn('w-full px-5 py-2 bg-transparent border-2 outline-none border-zinc-600 rounded-xl placeholder:text-zinc-500 focus:border-white', className) }}
+      classNames={{
+        input: cn(
+          'w-full px-5 py-2 bg-transparent border-2 outline-none border-zinc-600 rounded-xl placeholder:text-zinc-500 focus:border-white',
+          className
+        )
+      }}
       value={value}
       onChange={(event) => {
-        setValue(event.currentTarget.value);
-        rest.onChange && rest.onChange(event); // Ensure to call the passed onChange handler
+        onChange && onChange(event); 
       }}
       onFocus={(event) => {
         setFocused(true);
-        rest.onFocus && rest.onFocus(event); // Ensure to call the passed onFocus handler
+        rest.onFocus && rest.onFocus(event); 
       }}
       onBlur={(event) => {
         setFocused(false);
-        rest.onBlur && rest.onBlur(event); // Ensure to call the passed onBlur handler
+        rest.onBlur && rest.onBlur(event); 
       }}
       data-floating={floating}
       labelProps={{ 'data-floating': floating }}
@@ -60,29 +75,3 @@ export const Input = forwardRef<
 
 
 
-
-// import { InputHTMLAttributes, forwardRef } from 'react'
-// import cn from 'classnames'
-
-// //uses forwardRef to forward the ref to the underlying input element,
-// //allows the parent components to access and manipulate input element
-// //directly
-// export const Input = forwardRef<
-// //ensures ref is compatible with the input elements expected type
-//   HTMLInputElement,
-//   //specifies the type of props object the component accepts
-//   InputHTMLAttributes<HTMLInputElement>
-// >(({ className, ...rest }, ref) => {
-//   return (
-//     <input
-//       {...rest}
-//       //ref is assigned to the underlaying input element using the
-//       //ref attribute, enableing parent component to reference input elemnt
-//       ref={ref}
-//       className={cn(
-//         'w-full px-5 py-2 bg-transparent border-2 outline-none border-zinc-600 rounded-xl placeholder:text-zinc-500 focus:border-white',
-//         className,
-//       )}
-//     />
-//   )
-// })

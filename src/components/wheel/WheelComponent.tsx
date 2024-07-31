@@ -6,7 +6,9 @@ import { useWheel } from '../context/useWheel';
 
 
 const WheelComponent: FC = () => {
-    const { oneWheel, loading, spinAnimationTriggered,   landedValues, addLandedValue } = useWheel();
+    const { oneWheel, loading, spinAnimationTriggered, landedValues, addLandedValue } = useWheel();
+
+    const reversedValues = [...oneWheel?.values].reverse();
 
     const [isSpinning, setIsSpinning] = useState(false);
     const [wheelPos, setWheelPos] = useState(0);
@@ -14,7 +16,7 @@ const WheelComponent: FC = () => {
     const [endPos, setEndPos] = useState(0);
     const [startTime, setStartTime] = useState(0);
     const [endTime, setEndTime] = useState(0);
-    const [lastIndex, setLastIndex] = useState(0);
+    const [lastIndex, setLastIndex] = useState(-1);
     const slowDownRate = 1 / 1.8;
     const minSpins = 3 * Math.PI * 2;
     const spinTime = 200000;
@@ -26,8 +28,8 @@ const WheelComponent: FC = () => {
 
     // function to generate the SVG path for a slice
     const generateSlicePath = (index: number, total: number): string => {
-          //calculates the angle of each slice by divideing the circle
-         // 2π by the number of items
+        //calculates the angle of each slice by divideing the circle
+        // 2π by the number of items
         const angle = (2 * Math.PI) / total;
         //calculate the start and end angles of the slice
         const startAngle = index * angle;
@@ -40,15 +42,15 @@ const WheelComponent: FC = () => {
         const endY = radius + radius * Math.sin(endAngle);
 
         //determines whether the arc should be greater than 180 degrees.
-         //it's set to 1 if the angle is greater than π, otherwise, it's 0.
-         const largeArcFlag = angle > Math.PI ? 1 : 0;
-       
+        //it's set to 1 if the angle is greater than π, otherwise, it's 0.
+        const largeArcFlag = angle > Math.PI ? 1 : 0;
 
-            //svg paths:
-         //M =move to takes 2 points
-         //L =lineTo : creating a line
-         //A =eliptical arch: for the circle edge
-         //Z =close path
+
+        //svg paths:
+        //M =move to takes 2 points
+        //L =lineTo : creating a line
+        //A =eliptical arch: for the circle edge
+        //Z =close path
         return `M ${radius},${radius} L ${startX},${startY} A ${radius},${radius} 0 ${largeArcFlag} 1 ${endX},${endY} Z`;
     };
 
@@ -88,11 +90,11 @@ const WheelComponent: FC = () => {
     };
 
     const animate = () => {
-            //performance now method more precise than date.now()
+        //performance now method more precise than date.now()
         //captures the current time in millisecons
         const currentTime = performance.now();
         if (isSpinning) {
-             //uses wheelPosFunction, to calculate new position of the wheel
+            //uses wheelPosFunction, to calculate new position of the wheel
             const newWheelPos = wheelPosFunction(currentTime, startTime, endTime, wheelPos, endPos);
             setWheelPos(newWheelPos);
             if (currentTime >= endTime) {
@@ -104,7 +106,7 @@ const WheelComponent: FC = () => {
             setWheelPos(wheelPos + speed);
         }
 
-         //requests the next animation frame using requestAnimationFrame(animate), 
+        //requests the next animation frame using requestAnimationFrame(animate), 
         //which recursively calls the animate function. This creates a continuous loop 
         //for smooth animation.
         requestRef.current = requestAnimationFrame(animate);
@@ -120,24 +122,24 @@ const WheelComponent: FC = () => {
         const currentTime = performance.now();
         setStartTime(currentTime);
         setEndTime(currentTime + spinTime);
-    
+
         const slices = oneWheel?.values.length || 1;
         const sliceAngle = (2 * Math.PI) / slices;
-        
+
         let targetSlice;
-    
+
         // Determine the target slice
         if (oneWheel?.isRandom && oneWheel?.cycleOnce) {
             // If both random and cycleOnce are true
             let remainingSlices = oneWheel.values.filter(
                 (value) => !landedValues[oneWheel.id]?.some((landedValue) => landedValue.id === value.id)
             );
-    
+
             if (remainingSlices.length === 0) {
                 remainingSlices = oneWheel.values; // Reset if all values have been landed on
                 // clearLandedValues(oneWheel.id);
             }
-    
+
             const randomIndex = Math.floor(Math.random() * remainingSlices.length);
             const selectedValue = remainingSlices[randomIndex];
             targetSlice = oneWheel.values.findIndex((value) => value.id === selectedValue.id);
@@ -149,12 +151,12 @@ const WheelComponent: FC = () => {
             targetSlice = (lastIndex + 1) % slices;
             setLastIndex(targetSlice);
         }
-    
+
         const targetSliceCenter = targetSlice * sliceAngle + sliceAngle / 2;
         const currentWheelRotation = wheelPos % (2 * Math.PI);
         const newEndPos = wheelPos + minSpins - currentWheelRotation + targetSliceCenter;
         setEndPos(newEndPos);
-    
+
         // Handle landed values for cycleOnceState
         if (oneWheel?.cycleOnce && oneWheel) {
             const landedValue = oneWheel.values[targetSlice];
@@ -163,6 +165,7 @@ const WheelComponent: FC = () => {
             }
         }
     };
+    
 
 
     useEffect(() => {
@@ -178,7 +181,7 @@ const WheelComponent: FC = () => {
         //value is stored in requestRef.current so it can be referenced later. requestRef 
         //is a useRef hook, which is used to persist values between renders without 
         //causing re-renders
-     
+
         requestRef.current = requestAnimationFrame(animate);
 
         //This line defines a cleanup function that cancels the scheduled animation frame
@@ -202,13 +205,13 @@ const WheelComponent: FC = () => {
         return <div>Wheel not found</div>;
     }
 
-    
+
     return (
         <>
             <h1>{oneWheel?.title}</h1>
             <svg width={2 * radius} height={2 * radius} style={{ overflow: 'visible' }}>
                 <g transform={`rotate(${(wheelPos * 180) / Math.PI - 90}, ${radius}, ${radius})`}>
-                    {oneWheel.values.map((value, i) => {
+                    {reversedValues.map((value, i) => {
                         const { x, y, angle } = calculateTextPosition(i, oneWheel.values.length);
                         const chunks = splitByWords(value.value, 25);
                         return (
