@@ -185,7 +185,7 @@ const WheelComponent: FC = () => {
                             <g key={i}>
                                 <path
                                     d={generateSlicePath(i, oneWheel.values.length)}
-                                    fill="none"
+                                    fill={value.color || '#ffffff'}
                                     stroke={strokeColor}
                                     strokeWidth={strokeWidth}
                                 />

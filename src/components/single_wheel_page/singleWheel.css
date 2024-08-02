@@ -1,3 +1,5 @@
+
+
 input[type="color"] {
     clip: rect(0 0 0 0);
     clip-path: inset(50%);
@@ -27,3 +29,8 @@ input[type="color"] {
     -o-transform: matrix(-1, 0, 0, 1, 0, 0);
     transform: matrix(-1, 0, 0, 1, 0, 0);
   }
+
+  li {
+    background-color: inherit !important;
+}
+

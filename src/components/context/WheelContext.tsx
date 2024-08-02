@@ -212,24 +212,41 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
     }
   }, [wheels]);
 
-const updateColor = useCallback((wheel_id: string, value_id: string, color: string) => {
-    try {
-      const updatedWheels = wheels.map(wheel => {
+// const updateColor = useCallback((wheel_id: string, value_id: string, color: string) => {
+//     try {
+//       const updatedWheels = wheels.map(wheel => {
+//         if (wheel.id === wheel_id) {
+//           const updatedValues = wheel.values.map(value =>
+//             value.id === value_id ? { ...value, color: color } : value
+//           );
+//           return { ...wheel, values: updatedValues };
+//         }
+//         return wheel;
+//       });
+
+//       localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+//       setWheels(updatedWheels);
+//     } catch (error) {
+//       console.error("Error updating color:", error);
+//     }
+//   }, [wheels]);
+
+const updateColor = (wheel_id: string, value_id: string, color: string) => {
+    const updatedWheels = wheels.map(wheel => {
         if (wheel.id === wheel_id) {
-          const updatedValues = wheel.values.map(value =>
-            value.id === value_id ? { ...value, color: color } : value
-          );
-          return { ...wheel, values: updatedValues };
+            const updatedValues = wheel.values.map(value => {
+                if (value.id === value_id) {
+                    return { ...value, color };
+                }
+                return value;
+            });
+            return { ...wheel, values: updatedValues };
         }
         return wheel;
-      });
-
-      localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-      setWheels(updatedWheels);
-    } catch (error) {
-      console.error("Error updating color:", error);
-    }
-  }, [wheels]);
+    });
+    setWheels(updatedWheels);
+    localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+};
 
     const deleteValue = useCallback((wheel_id: string, value_id: string) => {
         return new Promise<void>((resolve, reject) => {
