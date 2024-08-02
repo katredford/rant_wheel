@@ -17,7 +17,8 @@ interface WheelContextType {
     addWheel: (input: string) => void
     updateWheel: (wheel_id: string, value: string) => void
     addValue: (wheel_id: string, value: string) => void
-    updateValue: (wheel_id: string, value_id: string, value: string) => void
+    // updateValue: (wheel_id: string, value_id: string, value: string) => void
+    updateValue: (wheel_id: string, value_id: string, newValue: string, color: string ) => void;
     deleteValue: (wheel_id: string, value_id: string) => Promise<void>;
     triggerSpinAnimation: () => void;
     spinAnimationTriggered: boolean;
@@ -26,6 +27,7 @@ interface WheelContextType {
     clearLandedValues: (wheel_id: string) => void;
     refreshWheelData: () => void;
     refreshTrigger: boolean;
+    updateColor: (wheel_id: string, value_id: string, color: string) => void;
 
 }
 
@@ -48,6 +50,7 @@ export const WheelContext = createContext<WheelContextType>({
    clearLandedValues: () => {},
    refreshWheelData: () => {},
    refreshTrigger: false,
+   updateColor: () => {}
     // newValues: state.values,
 });
 
@@ -140,8 +143,6 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             const newWheel = { id: uuidv4(), title: inputValue, values: [], isRandom: false, cycleOnce: false };
             setWheels(prevWheels => {
                 const updatedWheels = [...prevWheels, newWheel];
-                // console.log('Adding wheel:', newWheel);
-                // console.log('Updated wheels:', updatedWheels);
                 return updatedWheels;
             });
         } catch (error) {
@@ -153,13 +154,17 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 const addValue = useCallback((wheel_id: string, value: string) => {
     try {
-        const newValue: Value = { id: uuidv4(), value, wheel_id };
+        const newValue: Value = { 
+            id: uuidv4(), 
+            value, 
+            wheel_id, 
+            color: "#ff0000",  
+            imgSrc: []   
+        };
         setWheels(prevWheels => {
             const updatedWheels = prevWheels.map(wheel =>
                 wheel.id === wheel_id ? { ...wheel, values: [...wheel.values, newValue] } : wheel
             );
-            // console.log('Adding value:', newValue);
-            // console.log('Updated wheels:', updatedWheels);
             return updatedWheels;
         });
     } catch (error) {
@@ -187,33 +192,44 @@ const updateWheel = useCallback((wheel_id: string, title: string, updates: Parti
 
 
 
-const updateValue = useCallback((wheel_id: string, value_id: string, newValue: string) => {
+
+const updateValue = useCallback((wheel_id: string, value_id: string, newValue: string, color: string) => {
     try {
-        // Retrieve wheels from localStorage
-        const storedWheels = localStorage.getItem('wheels');
-        const wheels: Wheel[] = storedWheels ? JSON.parse(storedWheels) : [];
+      const updatedWheels = wheels.map(wheel => {
+        if (wheel.id === wheel_id) {
+          const updatedValues = wheel.values.map(value =>
+            value.id === value_id ? { ...value, value: newValue, color } : value
+          );
+          return { ...wheel, values: updatedValues };
+        }
+        return wheel;
+      });
 
-        // Find the wheel to update
-        const updatedWheels = wheels.map(wheel => {
-            if (wheel.id === wheel_id) {
-                // Find and update the value within the wheel
-                const updatedValues = wheel.values.map(value => 
-                    value.id === value_id ? { ...value, value: newValue } : value
-                );
-                return { ...wheel, values: updatedValues };
-            }
-            return wheel;
-        });
-   
-        // Save the updated wheels list back to localStorage
-        // localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-        setWheels(updatedWheels);
+      localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+      setWheels(updatedWheels);
     } catch (error) {
-        console.error("Error updating value:", error);
+      console.error("Error updating value:", error);
     }
-}, []);
+  }, [wheels]);
 
- 
+const updateColor = useCallback((wheel_id: string, value_id: string, color: string) => {
+    try {
+      const updatedWheels = wheels.map(wheel => {
+        if (wheel.id === wheel_id) {
+          const updatedValues = wheel.values.map(value =>
+            value.id === value_id ? { ...value, color: color } : value
+          );
+          return { ...wheel, values: updatedValues };
+        }
+        return wheel;
+      });
+
+      localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+      setWheels(updatedWheels);
+    } catch (error) {
+      console.error("Error updating color:", error);
+    }
+  }, [wheels]);
 
     const deleteValue = useCallback((wheel_id: string, value_id: string) => {
         return new Promise<void>((resolve, reject) => {
@@ -291,6 +307,7 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
         clearLandedValues,
         refreshWheelData,
         refreshTrigger,
+        updateColor
     //     refresh
     }
 

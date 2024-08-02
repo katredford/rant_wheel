@@ -32,7 +32,8 @@ const WheelControl: React.FC = () => {
         triggerSpinAnimation, 
         landedValues, 
         clearLandedValues, 
-        refreshTrigger
+        refreshTrigger,
+        updateColor
     } = useWheel();
 
     const [isPortalOpen, setIsPortalOpen] = useState(false);
@@ -179,14 +180,15 @@ const WheelControl: React.FC = () => {
                 <>
                     <ValuesControl
                         wheel={oneWheel}
-                        onUpdateValue={(wheelId, valueId, value) => {
-                            updateValue(wheelId, valueId, value);
+                        onUpdateValue={(wheelId, valueId, value, color) => {
+                            updateValue(wheelId, valueId, value, color);
                             refreshWheelData();
                         }}
                         onValueChanged={refreshWheelData}
                         deleteValue={(wheelId, valueId) => {
                             deleteValue(wheelId, valueId).then(refreshWheelData);
                         }}
+                        updateColor={updateColor}
                     />
 
                     <button onClick={triggerSpinAnimation} disabled={isTriggerDisabled}>

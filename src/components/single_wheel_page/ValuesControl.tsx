@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Input } from '../Input';
@@ -8,21 +9,21 @@ import cn from 'classnames';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Text } from '@mantine/core';
 import { Wheel, Value } from '../context/types';
+import "./singleWheel.css"
 
 interface ValuesControlProps {
     wheel?: Wheel;
-    onUpdateValue: (wheel_id: string, value_id: string, new_value: string) => void;
-    
+    onUpdateValue: (wheel_id: string, value_id: string, new_value: string, color: string) => void;
     deleteValue: (wheel_id: string, value_id: string) => void;
+    updateColor: (wheel_id: string, value_id: string, color: string) => void;
 }
 
-const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, 
-    
-     deleteValue }) => {
+const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, deleteValue, updateColor }) => {
     const [editingValueId, setEditingValueId] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
     const [values, setValues] = useState<Value[]>([]);
     const editInputRef = useRef<HTMLInputElement>(null);
+    const [colorChange, setColorChange] = useState("#ff0000");
 
     useEffect(() => {
         if (editingValueId !== null && editInputRef.current) {
@@ -57,28 +58,24 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue,
         }
     };
 
-    const handleUpdate = (valueId: string, wheelId: string) => {
+    const handleUpdate = (valueId: string, wheelId: string, colorChange: string) => {
         if (editedValue.trim() !== '') {
-            onUpdateValue(wheelId, valueId, editedValue);
-            // onValueChanged();
+            onUpdateValue(wheelId, valueId, editedValue, colorChange);
             setEditingValueId(null);
             setEditedValue('');
             toast.success('Value updated successfully!');
         } else {
             toast.error('Value field cannot be empty!');
         }
+        if (colorChange !== '') {
+            onUpdateValue(wheelId, valueId, editedValue, colorChange);
+        }
     };
 
     const handleDelete = (wheelId: string, valueId: string) => {
         deleteValue(wheelId, valueId);
-        // onValueChanged();
         toast.success('Value deleted successfully!');
     };
-
-
-    // const handleOnDragEnd = (result: any) => {
-    //   console.log(wheel?.values)
-    // };
 
     const handleOnDragEnd = (result: any) => {
         if (!result.destination) return;
@@ -93,14 +90,20 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue,
 
         if (wheel) {
             const updatedWheels = JSON.parse(localStorage.getItem('wheels') || '[]') as Wheel[];
-            const updatedWheelsWithNewOrder = updatedWheels.map(wheel => {
-                if (wheel.id === wheel.id) {
-                    return { ...wheel, values: reorderedValues };
+            const updatedWheelsWithNewOrder = updatedWheels.map(w => {
+                if (w.id === wheel.id) {
+                    return { ...w, values: reorderedValues };
                 }
-                return wheel;
+                return w;
             });
             localStorage.setItem('wheels', JSON.stringify(updatedWheelsWithNewOrder));
         }
+    };
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string) => {
+        setColorChange(e.target.value);
+        updateColor(wheelId, valueId, e.target.value);
+        toast.success('Color updated successfully!');
     };
 
     if (!wheel) {
@@ -137,7 +140,7 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue,
                                                     />
                                                     <button
                                                         className="px-5 py-2 text-sm font-normal text-orange-300 bg-orange-900 border-2 border-orange-900 active:scale-95 rounded-xl"
-                                                        onClick={() => handleUpdate(valObj.id, valObj.wheel_id)}
+                                                        onClick={() => handleUpdate(valObj.id, valObj.wheel_id, colorChange)}
                                                     >
                                                         Save
                                                     </button>
@@ -163,6 +166,15 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue,
                                                                 <RiDeleteBin7Line />
                                                                 Delete
                                                             </button>
+                                                            <label>
+                                                                <Input
+                                                                    type="color"
+                                                                    onChange={(e) => handleColorChange(e, valObj.id, valObj.wheel_id)}
+                                                                    id="favcolor"
+                                                                    value={valObj.color ? valObj.color : colorChange}
+                                                                />
+                                                                <span className='color mirror' aria-hidden="true" />
+                                                            </label>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -181,5 +193,7 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue,
 };
 
 export default ValuesControl;
+
+
 
 
