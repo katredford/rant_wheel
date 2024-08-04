@@ -188,7 +188,11 @@ const WheelControl: React.FC = () => {
                         deleteValue={(wheelId, valueId) => {
                             deleteValue(wheelId, valueId).then(refreshWheelData);
                         }}
-                        updateColor={updateColor}
+                        // updateColor={updateColor}
+                        updateColor={(wheelId, valueId, newColor) => {
+                            updateColor(wheelId, valueId, newColor);
+                            refreshWheelData();
+                        }}
                     />
 
                     <button onClick={triggerSpinAnimation} disabled={isTriggerDisabled}>

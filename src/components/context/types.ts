@@ -12,12 +12,20 @@ export interface Value {
     id: string;
     value: string;
     wheel_id: string;
-    color: string;
+    color: Color,
     imgSrc: Image;
 
 }
 
+export interface Color {
+    textColor: string;
+    sliceColor: string;
+}
 
+export interface Pointer {
+    pointerImg: Image,
+    
+}
 
 export interface Wheel {
     id: string;
@@ -27,4 +35,9 @@ export interface Wheel {
     values: Value[];
     isRandom: boolean;
     cycleOnce: boolean;
+    strokeColor:string;
+    strokeWidth: number;
+    spinLength: number;
+    slowDown: number;
+    radius: number;
 }

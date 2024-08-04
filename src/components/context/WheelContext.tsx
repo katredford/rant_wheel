@@ -3,9 +3,24 @@ import React, { createContext, useState, useEffect, ReactNode, useCallback, useR
 import axios from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 // import { useParams } from 'react-router-dom';
-import { Wheel, Value } from './types';
+import { Wheel, Value, Color, Image } from './types';
 
+// Default color values
+const defaultColor: Color = {
+    textColor: "#000000",
+    sliceColor:  "#ff0000",
+};
 
+// Default image values
+const defaultImage: Image = {
+    id: uuidv4(), 
+    x: 0,
+    y: 0,
+    rotation: 0,
+    width: 0,
+    height: 0,
+    src: ""
+};
 
 //hold an array of wheels so we can manage and update multiple
 interface WheelContextType {
@@ -140,7 +155,7 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
     const addWheel = useCallback((inputValue: string) => {
         try {
-            const newWheel = { id: uuidv4(), title: inputValue, values: [], isRandom: false, cycleOnce: false };
+            const newWheel = { id: uuidv4(), title: inputValue, values: [], isRandom: false, cycleOnce: false, strokeColor: "#000000", strokeWidth: 4 };
             setWheels(prevWheels => {
                 const updatedWheels = [...prevWheels, newWheel];
                 return updatedWheels;
@@ -151,28 +166,26 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     }, []);
 
 
-
 const addValue = useCallback((wheel_id: string, value: string) => {
     try {
         const newValue: Value = { 
             id: uuidv4(), 
             value, 
             wheel_id, 
-            color: "#ff0000",  
-            imgSrc: []   
+            color: defaultColor,  
+            imgSrc: defaultImage   
         };
         setWheels(prevWheels => {
             const updatedWheels = prevWheels.map(wheel =>
                 wheel.id === wheel_id ? { ...wheel, values: [...wheel.values, newValue] } : wheel
             );
+            localStorage.setItem('wheels', JSON.stringify(updatedWheels));
             return updatedWheels;
         });
     } catch (error) {
         console.error("Error adding value:", error);
     }
-}, []);
-
-
+}, [setWheels]);
 
 const updateWheel = useCallback((wheel_id: string, title: string, updates: Partial<Wheel>) => {
     try {
@@ -212,31 +225,14 @@ const updateValue = useCallback((wheel_id: string, value_id: string, newValue: s
     }
   }, [wheels]);
 
-// const updateColor = useCallback((wheel_id: string, value_id: string, color: string) => {
-//     try {
-//       const updatedWheels = wheels.map(wheel => {
-//         if (wheel.id === wheel_id) {
-//           const updatedValues = wheel.values.map(value =>
-//             value.id === value_id ? { ...value, color: color } : value
-//           );
-//           return { ...wheel, values: updatedValues };
-//         }
-//         return wheel;
-//       });
 
-//       localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-//       setWheels(updatedWheels);
-//     } catch (error) {
-//       console.error("Error updating color:", error);
-//     }
-//   }, [wheels]);
 
-const updateColor = (wheel_id: string, value_id: string, color: string) => {
+const updateColor = (wheel_id: string, value_id: string, newColor: Color) => {
     const updatedWheels = wheels.map(wheel => {
         if (wheel.id === wheel_id) {
             const updatedValues = wheel.values.map(value => {
                 if (value.id === value_id) {
-                    return { ...value, color };
+                    return { ...value, color: newColor };
                 }
                 return value;
             });
