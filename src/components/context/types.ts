@@ -1,3 +1,17 @@
+
+export interface Value {
+    id: string;
+    value?: string;
+    wheel_id: string;
+    color: Color,
+    imgSrc?: Image;
+    
+}
+
+export interface Color {
+    textColor: string;
+    sliceColor: string;
+}
 export interface Image {
     id: string;
     x: number;
@@ -8,23 +22,12 @@ export interface Image {
     src: string;
 }
 
-export interface Value {
-    id: string;
-    value: string;
-    wheel_id: string;
-    color: Color,
-    imgSrc: Image;
-
-}
-
-export interface Color {
-    textColor: string;
-    sliceColor: string;
-}
-
-export interface Pointer {
-    pointerImg: Image,
-    
+export interface PointerElement {
+    image?: Image; // ? means optional
+    fill?: string; 
+    stroke?: string; 
+    strokeWidth?: number; 
+    radius: number; 
 }
 
 export interface Wheel {
@@ -39,5 +42,8 @@ export interface Wheel {
     strokeWidth: number;
     spinLength: number;
     slowDown: number;
+    minSpins: number;
     radius: number;
+
+    // pointer: PointerElement;
 }

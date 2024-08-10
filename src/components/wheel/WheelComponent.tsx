@@ -12,10 +12,12 @@ const WheelComponent: FC = () => {
     const [startTime, setStartTime] = useState(0);
     const [endTime, setEndTime] = useState(0);
     const [lastIndex, setLastIndex] = useState(-1);
-    const slowDownRate = 1 / 1.8;
-    const minSpins = 3 * Math.PI * 2;
-    const spinTime = 200000;
+    const slowDownRate = 1 / oneWheel?.slowDown || 1.8;
+    const minSpins = oneWheel?.minSpins * Math.PI * 2 || 3 * Math.PI * 2;
+    const spinTime = oneWheel?.spinLength * 100 || 200000;
     const requestRef = useRef<number>(0);
+
+console.log(spinTime)
 
     const radius: number = 200;
     const strokeColor: string = oneWheel?.strokeColor || '#000000';
