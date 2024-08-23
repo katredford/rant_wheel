@@ -22,39 +22,40 @@ import useLocalStorageListener from '../hooks/useLocalStorageListener';
 
 const WheelControl: React.FC = () => {
     const { id } = useParams<{ id: string }>();
-    const { 
-        oneWheel, 
-        loading, 
-        getOneWheel, 
-        updateWheel, 
-        updateValue, 
-        deleteValue, 
-        triggerSpinAnimation, 
-        landedValues, 
-        clearLandedValues, 
-        refreshTrigger
+    const {
+        oneWheel,
+        loading,
+        getOneWheel,
+        updateWheel,
+        updateValue,
+        deleteValue,
+        triggerSpinAnimation,
+        landedValues,
+        clearLandedValues,
+        refreshTrigger,
+        updateColor
     } = useWheel();
 
     const [isPortalOpen, setIsPortalOpen] = useState(false);
     const [isTriggerDisabled, setIsTriggerDisabled] = useState(false);
 
 
-    const [editingWheelId, setEditingWheelId] = useState<string| null>(null);
+    const [editingWheelId, setEditingWheelId] = useState<string | null>(null);
     //holds edited value
     const [editedWheel, setEditedWheel] = useState<string>('');
-   
+
     const editInputRef = useRef<HTMLInputElement>(null)
     const refreshWheelData = () => {
-   
+
         getOneWheel(String(id));
     };
 
     // Listen for changes to the specific wheel in local storage
-  
+
     useEffect(() => {
         // This effect will run whenever refreshTrigger changes
-     
-    
+
+
         // Add any logic needed to refresh the WheelControl component here
         getOneWheel(String(id));
     }, [refreshTrigger, id, getOneWheel]);
@@ -64,14 +65,14 @@ const WheelControl: React.FC = () => {
     }, [id, getOneWheel]);
 
     useEffect(() => {
-        if(oneWheel && landedValues[oneWheel.id]?.length === oneWheel.values.length) {
+        if (oneWheel && landedValues[oneWheel.id]?.length === oneWheel.values.length) {
             setIsTriggerDisabled(true);
-        }else {
+        } else {
             setIsTriggerDisabled(false);
         }
     }, [landedValues, oneWheel]);
 
-   
+
 
     const handleOpenPortal = () => {
         setIsPortalOpen(true);
@@ -100,7 +101,7 @@ const WheelControl: React.FC = () => {
 
     };
 
-    const handleUpdate = ( wheelId: string) => {
+    const handleUpdate = (wheelId: string) => {
         if (editedWheel.trim() !== '') {
             updateWheel(wheelId, editedWheel)
             refreshWheelData();
@@ -108,9 +109,9 @@ const WheelControl: React.FC = () => {
             //reset state
             setEditingWheelId(null);
             setEditedWheel('');
-            toast.success('Todo updated successfully!')
+            toast.success('Wheel updated successfully!')
         } else {
-            toast.error('Todo field cannot be empty!')
+            toast.error('Wheel field cannot be empty!')
         }
     }
 
@@ -123,12 +124,49 @@ const WheelControl: React.FC = () => {
             updateWheel(oneWheel.id, oneWheel.title, { ...oneWheel, cycleOnce: checked });
         }
     };
+
+    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>,  wheelId: string, colorType: 'strokeColor') => {
+    //     const newColor = e.target.value;
+    //     // updateColor(wheelId { ...values.find(v => v.id === valueId)!.color, [colorType]: newColor });
+    // };
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, wheelId: string | undefined) => {
+        if (!wheelId) return;
+        const newValue = e.target.value;
+    
+        // Use the existing updateWheel function
+        updateWheel(wheelId, '', { strokeColor: newValue });
+    };
+
+    const handleStrokeChange = (e: React.ChangeEvent<HTMLInputElement>, wheelId: string | undefined) => {
+        if (!wheelId) return;
+        const newValue = parseInt(e.target.value, 10);
+    
+        // Use the existing updateWheel function
+        updateWheel(wheelId, '', { strokeWidth: newValue });
+    };
+
+    const handleSpinLengthChange = (e: React.ChangeEvent<HTMLInputElement>, wheelId: string | undefined) => {
+        if (!wheelId) return;
+        const newValue = parseInt(e.target.value, 10);
+    
+        // Use the existing updateWheel function
+        updateWheel(wheelId, '', { spinLength: newValue });
+    };
+
+    const handleMinSpinsChange = (e: React.ChangeEvent<HTMLInputElement>, wheelId: string | undefined) => {
+        if (!wheelId) return;
+        const newValue = parseInt(e.target.value, 10);
+    
+        // Use the existing updateWheel function
+        updateWheel(wheelId, '', { minSpins: newValue });
+    };
     return (
         <>
-         <Toaster position="bottom-center" />
+            <Toaster position="bottom-center" />
 
 
-<motion.h1
+            <motion.h1
                 className="p-5 rounded-xl bg-zinc-900"
                 key={oneWheel?.id}
             >
@@ -150,6 +188,46 @@ const WheelControl: React.FC = () => {
                         >
                             Save
                         </button>
+
+                        
+                        <label>
+                            Stroke Width:
+                            <input
+                                type="number"
+                                onChange={(e) => handleStrokeChange(e, oneWheel?.id, 'strokeWidth')}
+                                value={oneWheel.strokeWidth || 4}
+                            />
+                         
+                        </label>
+                        <label>
+                            Spin length:
+                            <input
+                                type="number"
+                                onChange={(e) => handleSpinLengthChange(e, oneWheel?.id, 'spinLength')}
+                                value={oneWheel.spinLength || 200}
+                            />
+                         
+                        </label>
+
+                        <label>
+                            minimum spins:
+                            <input
+                                type="number"
+                                onChange={(e) => handleMinSpinsChange(e, oneWheel?.id, 'minSpins')}
+                                value={oneWheel.minSpins || 3}
+                            />
+                         
+                        </label>
+                        <label>
+                            Stroke color:
+                            <Input
+                                type="color"
+                                onChange={(e) => handleColorChange(e, oneWheel?.id, 'strokeColor')}
+                                value={oneWheel.strokeColor || "#000000"}
+                            />
+                            <span className='color mirror' aria-hidden="true" />
+                        </label>
+                        
                     </motion.div>
                 ) : (
                     <div className="flex flex-col gap-5">
@@ -173,25 +251,30 @@ const WheelControl: React.FC = () => {
 
 
 
-           
+
             <AddValueForm wheel_id={String(id)} onValueAdded={refreshWheelData} />
             {oneWheel.values && oneWheel.values.length > 0 ? (
                 <>
                     <ValuesControl
                         wheel={oneWheel}
-                        onUpdateValue={(wheelId, valueId, value) => {
-                            updateValue(wheelId, valueId, value);
+                        onUpdateValue={(wheelId, valueId, value, color) => {
+                            updateValue(wheelId, valueId, value, color);
                             refreshWheelData();
                         }}
                         onValueChanged={refreshWheelData}
                         deleteValue={(wheelId, valueId) => {
                             deleteValue(wheelId, valueId).then(refreshWheelData);
                         }}
+                        // updateColor={updateColor}
+                        updateColor={(wheelId, valueId, newColor) => {
+                            updateColor(wheelId, valueId, newColor);
+                            refreshWheelData();
+                        }}
                     />
 
                     <button onClick={triggerSpinAnimation} disabled={isTriggerDisabled}>
                         Trigger Animation
-                        </button>
+                    </button>
                 </>
             ) : (
 
@@ -207,17 +290,17 @@ const WheelControl: React.FC = () => {
 
 
             <Switch
-    label="Random"
-    classNames={classes}
-    checked={oneWheel.isRandom || false}
-    onChange={(e) => handleSwitchChange('random', e.currentTarget.checked)}
-/>
-<Switch
-    label="Cycle once"
-    classNames={classes}
-    checked={oneWheel.cycleOnce || false}
-    onChange={(e) => handleSwitchChange('cycleOnce', e.currentTarget.checked)}
-/>
+                label="Random"
+                classNames={classes}
+                checked={oneWheel.isRandom || false}
+                onChange={(e) => handleSwitchChange('random', e.currentTarget.checked)}
+            />
+            <Switch
+                label="Cycle once"
+                classNames={classes}
+                checked={oneWheel.cycleOnce || false}
+                onChange={(e) => handleSwitchChange('cycleOnce', e.currentTarget.checked)}
+            />
 
             <button onClick={handleOpenPortal}>Open Portal</button>
             <button onClick={handleClosePortal}>Close Portal</button>

@@ -1,10 +1,19 @@
-Why does the order the wheel lands not start at the beginning of the values arraY?
+Why does the order the wheel lands not start at the beginning of the values arraY?✅
 
 
-clear feild after
-Add colors
+clear feild after ✅
+Add colors to values, add color picker
+
+add tools to change position of pointer x y rotate
+add tools to change length of spin time
 add pictures - cloudinary
 add middle pointer -cloudinary?
 
 export settings JSON
 import settings JSON
+
+style style style
+
+maybe have a feature that holds previously used values
+have a thing where all the values show on the screen but you can toggle on and off if they get included in the 
+wheel
