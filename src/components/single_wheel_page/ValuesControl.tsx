@@ -10,15 +10,18 @@ import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { Text } from '@mantine/core';
 import { Wheel, Value } from '../context/types';
 import "./singleWheel.css"
+import { Color } from '../context/types'
 
 interface ValuesControlProps {
     wheel?: Wheel;
+    onValueChanged: () => void;
     onUpdateValue: (wheel_id: string, value_id: string, new_value: string, colors: { sliceColor: string, textColor: string }) => void;
     deleteValue: (wheel_id: string, value_id: string) => void;
-    updateColor: (wheel_id: string, value_id: string, colors: { sliceColor: string, textColor: string }) => void;
+    updateValue: (wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => void;
+
 }
 
-const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, deleteValue, updateColor }) => {
+const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, deleteValue, updateValue }) => {
     const [editingValueId, setEditingValueId] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
     const [values, setValues] = useState<Value[]>([]);
@@ -36,7 +39,7 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
             const storedOrder = localStorage.getItem(`wheel-${wheel.id}-order`);
             if (storedOrder) {
                 const order = JSON.parse(storedOrder);
-                const orderedValues = order.map((id: string) => wheel.values.find(v => v.id === id));
+                const orderedValues = order.map((id: string) => wheel.values.find((v) => v.id === id));
                 setValues(orderedValues.filter(v => v !== undefined) as Value[]);
             } else {
                 setValues(wheel.values);
@@ -58,11 +61,14 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
         }
     };
 
-    const handleUpdate = (valueId: string, wheelId: string, colors: { sliceColor: string, textColor: string }) => {
+    const handleUpdate = (valueId: string, wheelId: string, colors?: Color) => {
+        const defaultColors = { sliceColor: '#ff0000', textColor: '#000000' };
+        const { sliceColor = defaultColors.sliceColor, textColor = defaultColors.textColor } = colors || {};
         if (editedValue.trim() !== '') {
-            onUpdateValue(wheelId, valueId, editedValue, colors);
+            onUpdateValue(wheelId, valueId, editedValue, { sliceColor, textColor });
             setEditingValueId(null);
             setEditedValue('');
+
             setShowOptions(null);
             toast.success('Value updated successfully!');
         } else {
@@ -99,9 +105,23 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
     };
 
 
-    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: 'sliceColor' | 'textColor') => {
+    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: 'sliceColor' | 'textColor') => {
+    //     const newColor = e.target.value;
+    //     updateValue(wheelId, valueId, { ...values.find(v => v.id === valueId)!.color, [colorType]: newColor });
+    // };
+
+    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
+    //     const newColor = e.target.value;
+    //     const currentColor = values.find(v => v.id === valueId)!.color;
+    //     updateValue(wheelId, valueId, undefined, { ...currentColor, [colorType]: newColor });
+    // };
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
         const newColor = e.target.value;
-        updateColor(wheelId, valueId, { ...values.find(v => v.id === valueId)!.color, [colorType]: newColor });
+        const currentValue = values.find(v => v.id === valueId);
+        if (currentValue) {
+            updateValue(wheelId, valueId, currentValue.value, { ...currentValue.color, [colorType]: newColor });
+        }
     };
 
     // const toggleShowOptions = (valueId: string) => {

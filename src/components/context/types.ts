@@ -18,8 +18,9 @@ export interface Value {
 }
 
 export interface Color {
-    textColor: string;
-    sliceColor: string;
+    textColor?: string;
+    sliceColor?: string;
+    strokeColor?: string;
 }
 
 export interface Pointer {

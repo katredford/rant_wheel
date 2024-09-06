@@ -33,7 +33,7 @@ const WheelControl: React.FC = () => {
         landedValues, 
         clearLandedValues, 
         refreshTrigger,
-        updateColor
+        // updateColor
     } = useWheel();
 
     const [isPortalOpen, setIsPortalOpen] = useState(false);
@@ -109,9 +109,9 @@ const WheelControl: React.FC = () => {
             //reset state
             setEditingWheelId(null);
             setEditedWheel('');
-            toast.success('Todo updated successfully!')
+            toast.success('Wheel updated successfully!')
         } else {
-            toast.error('Todo field cannot be empty!')
+            toast.error('Wheel field cannot be empty!')
         }
     }
 
@@ -189,8 +189,8 @@ const WheelControl: React.FC = () => {
                             deleteValue(wheelId, valueId).then(refreshWheelData);
                         }}
                         // updateColor={updateColor}
-                        updateColor={(wheelId, valueId, newColor) => {
-                            updateColor(wheelId, valueId, newColor);
+                        updateValue={(wheelId, valueId, newColor) => {
+                            updateValue(wheelId, valueId, newColor);
                             refreshWheelData();
                         }}
                     />
