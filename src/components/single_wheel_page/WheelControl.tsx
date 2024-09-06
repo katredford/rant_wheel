@@ -33,7 +33,7 @@ const WheelControl: React.FC = () => {
         landedValues, 
         clearLandedValues, 
         refreshTrigger,
-        // updateColor
+        updateColor
     } = useWheel();
 
     const [isPortalOpen, setIsPortalOpen] = useState(false);
@@ -189,8 +189,8 @@ const WheelControl: React.FC = () => {
                             deleteValue(wheelId, valueId).then(refreshWheelData);
                         }}
                         // updateColor={updateColor}
-                        updateValue={(wheelId, valueId, newColor) => {
-                            updateValue(wheelId, valueId, newColor);
+                        updateColor={(wheelId, valueId, newColor) => {
+                            updateColor(wheelId, valueId, newColor);
                             refreshWheelData();
                         }}
                     />

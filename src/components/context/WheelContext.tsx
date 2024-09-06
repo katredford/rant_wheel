@@ -34,7 +34,7 @@ interface WheelContextType {
     updateWheel: (wheel_id: string, title: string, updates?: Partial<Wheel>) => void;
     addValue: (wheel_id: string, value: string) => void
     // updateValue: (wheel_id: string, value_id: string, value: string) => void
-
+    updateColor: (wheel_id: string, value_id: string, color: string) => void;
     updateValue: (wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => void;
     deleteValue: (wheel_id: string, value_id: string) => Promise<void>;
     triggerSpinAnimation: () => void;
@@ -332,22 +332,22 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 
 
-    // const updateColor = (wheel_id: string, value_id: string, newColor: Color) => {
-    //     const updatedWheels = wheels.map(wheel => {
-    //         if (wheel.id === wheel_id) {
-    //             const updatedValues = wheel.values.map(value => {
-    //                 if (value.id === value_id) {
-    //                     return { ...value, color: newColor };
-    //                 }
-    //                 return value;
-    //             });
-    //             return { ...wheel, values: updatedValues };
-    //         }
-    //         return wheel;
-    //     });
-    //     setWheels(updatedWheels);
-    //     localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-    // };
+    const updateColor = (wheel_id: string, value_id: string, newColor: Color) => {
+        const updatedWheels = wheels.map(wheel => {
+            if (wheel.id === wheel_id) {
+                const updatedValues = wheel.values.map(value => {
+                    if (value.id === value_id) {
+                        return { ...value, color: newColor };
+                    }
+                    return value;
+                });
+                return { ...wheel, values: updatedValues };
+            }
+            return wheel;
+        });
+        setWheels(updatedWheels);
+        localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+    };
 
     const deleteValue = useCallback((wheel_id: string, value_id: string) => {
         return new Promise<void>((resolve, reject) => {
@@ -426,7 +426,7 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         refreshWheelData,
         // values: oneWheel?.values || [],
         refreshTrigger,
-        // updateColor
+        updateColor
         //     refresh
     }
 
