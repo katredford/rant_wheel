@@ -39,12 +39,12 @@ interface WheelContextType {
     deleteValue: (wheel_id: string, value_id: string) => Promise<void>;
     triggerSpinAnimation: () => void;
     spinAnimationTriggered: boolean;
-    landedValues: { [key: string]: Value[] }; 
+    landedValues: { [key: string]: Value[] };
     addLandedValue: (wheel_id: string, value: Value) => void;
     clearLandedValues: (wheel_id: string) => void;
     refreshWheelData: () => void;
     refreshTrigger: boolean;
-  
+
 
 }
 
@@ -233,27 +233,103 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     //     }
     // }, [wheels]);
 
+    // const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => {
+
+    //     try {
+    //         const updatedWheels = wheels.map(wheel => {
+    //             if (wheel.id === wheel_id) {
+    //                 const updatedValues = wheel.values.map(value =>
+    //                     value.id === value_id
+    //                         ? { ...value, value: newValue, color: newColor || value.color } 
+    //                         : value
+    //                 );
+    //                 return { ...wheel, values: updatedValues };
+    //             }
+    //             return wheel;
+    //         });
+
+    //         localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+    //         setWheels(updatedWheels);
+    //     } catch (error) {
+    //         console.error("Error updating value:", error);
+    //     }
+    // }, [wheels]);
+
+
+    // const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => {
+    //     console.log("CONTEXT UPDATE", newColor)
+    //     try {
+    //         const updatedWheels = wheels.map(wheel => {
+    //             if (wheel.id === wheel_id) {
+    //                 const updatedValues = wheel.values.map(value =>
+    //                     value.id === value_id
+    //                         ? {
+    //                               ...value,
+    //                               value: newValue ?? value.value,
+    //                               color: newColor ? { ...value.color, ...newColor } : value.color
+    //                           }
+    //                         : value
+    //                 );
+    //                 return { ...wheel, values: updatedValues };
+    //             }
+    //             return wheel;
+    //         });
+
+    //         // Optional: Validate that updatedWheels is of type Wheel[]
+    //         if (updatedWheels.every(w => w.values.every(v => typeof v.value === 'string'))) {
+    //             console.log("Updated Wheels:", updatedWheels); // Log the updated wheels
+    //             localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+    //             setWheels(updatedWheels);
+    //         } else {
+    //             console.error("Invalid wheel data structure");
+    //         }
+    //     } catch (error) {
+    //         console.error("Error updating value:", error);
+    //     }
+    // }, [wheels]);
+
     const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => {
+        console.log("CONTEXT UPDATE - wheel_id:", wheel_id);
+        console.log("CONTEXT UPDATE - value_id:", value_id);
+        console.log("CONTEXT UPDATE - newValue:", newValue);
+        console.log("CONTEXT UPDATE - newColor:", newColor);
+
         try {
             const updatedWheels = wheels.map(wheel => {
                 if (wheel.id === wheel_id) {
                     const updatedValues = wheel.values.map(value =>
                         value.id === value_id
-                            ? { ...value, value: newValue, color: newColor || value.color } // Use the Color object
+                            ? {
+                                ...value,
+                                value: newValue ?? value.value,
+                                color: {
+                                    ...value.color,
+                                    ...(newColor || {}) // Ensure we only spread non-undefined newColor
+                                }
+                            }
                             : value
                     );
                     return { ...wheel, values: updatedValues };
                 }
                 return wheel;
             });
-    
-            localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-            setWheels(updatedWheels);
+
+            if (updatedWheels.every(w => w.values.every(v => typeof v.value === 'string'))) {
+                console.log("Updated Wheels:", updatedWheels);
+                localStorage.setItem('wheels', JSON.stringify(updatedWheels));
+                setWheels(updatedWheels);
+            } else {
+                console.error("Invalid wheel data structure");
+            }
         } catch (error) {
             console.error("Error updating value:", error);
         }
     }, [wheels]);
-    
+
+
+
+
+
 
 
     // const updateColor = (wheel_id: string, value_id: string, newColor: Color) => {
