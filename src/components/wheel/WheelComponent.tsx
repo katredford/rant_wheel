@@ -12,12 +12,10 @@ const WheelComponent: FC = () => {
     const [startTime, setStartTime] = useState(0);
     const [endTime, setEndTime] = useState(0);
     const [lastIndex, setLastIndex] = useState(-1);
-    const slowDownRate = 1 / oneWheel?.slowDown || 1.8;
-    const minSpins = oneWheel?.minSpins * Math.PI * 2 || 3 * Math.PI * 2;
-    const spinTime = oneWheel?.spinLength * 100 || 200000;
+    const slowDownRate = 1 / 1.8;
+    const minSpins = 3 * Math.PI * 2;
+    const spinTime = 200000;
     const requestRef = useRef<number>(0);
-
-console.log(spinTime)
 
     const radius: number = 200;
     const strokeColor: string = oneWheel?.strokeColor || '#000000';
@@ -183,7 +181,7 @@ console.log(spinTime)
                 <g transform={`rotate(${(wheelPos * 180) / Math.PI - 90}, ${radius}, ${radius})`}>
                     {reversedValues.map((value, i) => {
                         const { x, y, angle } = calculateTextPosition(i, oneWheel.values.length);
-                        const { x: imgX, y: imgY, width, height, angle: imgAngle } = calculateImagePosition(i, oneWheel.values.length);
+                        // const { x: imgX, y: imgY, width, height, angle: imgAngle } = calculateImagePosition(i, oneWheel.values.length);
                         const chunks = splitByWords(value.value, 25);
                         return (
                             <g key={i}>
@@ -193,7 +191,7 @@ console.log(spinTime)
                                     stroke={strokeColor}
                                     strokeWidth={strokeWidth}
                                 />
-                                <image
+                                {/* <image
                                     // href={value.image}
                                     href="https://tse1.explicit.bing.net/th?id=OIP.-7AAWcwTG91At850PR4D3QHaGL&pid=Api" // Assume `value.image` contains the URL of the image
                                     x={imgX}
@@ -201,7 +199,7 @@ console.log(spinTime)
                                     width={width}
                                     height={height}
                                     transform={`rotate(${imgAngle}, ${imgX + width / 2}, ${imgY + height / 2})`}
-                                />
+                                /> */}
                                 {chunks.map((chunk, j) => (
                                     <text
                                         key={`${i}-${j}`}

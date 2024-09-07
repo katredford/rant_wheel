@@ -6,6 +6,7 @@ import { Input } from '../Input'
 
 interface AddValueFormProps {
     wheel_id: string;
+    onValueAdded?: () => void;
 
 }
 
@@ -28,12 +29,12 @@ const AddValueForm: React.FC<AddValueFormProps> = ({ wheel_id }) => {
             addValue(wheel_id, inputValue)
             // onValueAdded()
             setInputValue('')
-            
+
             toast.success('Value added')
         } else {
             toast.error('Value field cannot be empty')
         }
-       
+
     }
 
     return (
@@ -47,13 +48,13 @@ const AddValueForm: React.FC<AddValueFormProps> = ({ wheel_id }) => {
                         onChange={e => setInputValue(e.target.value)}
                         type="text"
                         className="w-full px-5 py-2 bg-transparent border-2 outline-none border-zinc-600 rounded-xl placeholder:text-zinc-500 focus:border-white"
-                        placeholder="add a wheel value ..."
+                        placeholder="start typing ..."
                     />
                     <button
                         type="submit"
                         className="px-5 py-2 text-sm font-normal text-blue-300 bg-blue-900 border-2 border-blue-900 active:scale-95 rounded-xl"
                     >
-                        add value
+                        Submit
                     </button>
                 </div>
             </form>
