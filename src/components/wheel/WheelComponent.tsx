@@ -180,7 +180,7 @@ const WheelComponent: FC = () => {
                 <g transform={`rotate(${(wheelPos * 180) / Math.PI - 90}, ${radius}, ${radius})`}>
                     {reversedValues.map((value, i) => {
                         const { x, y, angle } = calculateTextPosition(i, oneWheel.values.length);
-                        const { x: imgX, y: imgY, width, height, angle: imgAngle } = calculateImagePosition(i, oneWheel.values.length);
+                        // const { x: imgX, y: imgY, width, height, angle: imgAngle } = calculateImagePosition(i, oneWheel.values.length);
                         const chunks = splitByWords(value.value, 25);
                         return (
                             <g key={i}>
@@ -190,7 +190,7 @@ const WheelComponent: FC = () => {
                                     stroke={strokeColor}
                                     strokeWidth={strokeWidth}
                                 />
-                                <image
+                                {/* <image
                                     // href={value.image}
                                     href="https://tse1.explicit.bing.net/th?id=OIP.-7AAWcwTG91At850PR4D3QHaGL&pid=Api" // Assume `value.image` contains the URL of the image
                                     x={imgX}
@@ -198,7 +198,7 @@ const WheelComponent: FC = () => {
                                     width={width}
                                     height={height}
                                     transform={`rotate(${imgAngle}, ${imgX + width / 2}, ${imgY + height / 2})`}
-                                />
+                                /> */}
                                 {chunks.map((chunk, j) => (
                                     <text
                                         key={`${i}-${j}`}

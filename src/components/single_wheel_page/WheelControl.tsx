@@ -56,7 +56,6 @@ const WheelControl: React.FC = () => {
         // This effect will run whenever refreshTrigger changes
      
     
-        // Add any logic needed to refresh the WheelControl component here
         getOneWheel(String(id));
     }, [refreshTrigger, id, getOneWheel]);
 
@@ -124,6 +123,23 @@ const WheelControl: React.FC = () => {
             updateWheel(oneWheel.id, oneWheel.title, { ...oneWheel, cycleOnce: checked });
         }
     };
+
+    const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, wheelId: string | undefined) => {
+        if (!wheelId) return;
+        const newValue = e.target.value;
+    
+        // Use the existing updateWheel function
+        updateWheel(wheelId, '', { strokeColor: newValue });
+    };
+
+    const handleStrokeChange = (e: React.ChangeEvent<HTMLInputElement>, wheelId: string | undefined) => {
+        if (!wheelId) return;
+        const newValue = parseInt(e.target.value, 10);
+    
+        // Use the existing updateWheel function
+        updateWheel(wheelId, '', { strokeWidth: newValue });
+    };
+
     return (
         <>
          <Toaster position="bottom-center" />
@@ -151,6 +167,25 @@ const WheelControl: React.FC = () => {
                         >
                             Save
                         </button>
+
+                        <label>
+                            Stroke Width:
+                            <input
+                                type="number"
+                                onChange={(e) => handleStrokeChange(e, oneWheel?.id, 'strokeWidth')}
+                                value={oneWheel.strokeWidth || 4}
+                            />
+                        </label>
+
+                        <label>
+                            Stroke color:
+                            <Input
+                                type="color"
+                                onChange={(e) => handleColorChange(e, oneWheel?.id, 'strokeColor')}
+                                value={oneWheel.strokeColor || "#000000"}
+                            />
+                            <span className='color mirror' aria-hidden="true" />
+                        </label>
                     </motion.div>
                 ) : (
                     <div className="flex flex-col gap-5">

@@ -67,7 +67,7 @@ export const WheelContext = createContext<WheelContextType>({
     clearLandedValues: () => { },
     refreshWheelData: () => { },
     refreshTrigger: false,
-    // updateColor: () => { }
+    updateColor: () => { }
     // newValues: state.values,
 });
 
@@ -214,85 +214,12 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
 
 
-    // const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, color?: Color) => {
-    //     try {
-    //         const updatedWheels = wheels.map(wheel => {
-    //             if (wheel.id === wheel_id) {
-    //                 const updatedValues = wheel.values.map(value =>
-    //                     value.id === value_id ? { ...value, value: newValue, color } : value
-    //                 );
-    //                 return { ...wheel, values: updatedValues };
-    //             }
-    //             return wheel;
-    //         });
-
-    //         localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-    //         setWheels(updatedWheels);
-    //     } catch (error) {
-    //         console.error("Error updating value:", error);
-    //     }
-    // }, [wheels]);
-
-    // const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => {
-
-    //     try {
-    //         const updatedWheels = wheels.map(wheel => {
-    //             if (wheel.id === wheel_id) {
-    //                 const updatedValues = wheel.values.map(value =>
-    //                     value.id === value_id
-    //                         ? { ...value, value: newValue, color: newColor || value.color } 
-    //                         : value
-    //                 );
-    //                 return { ...wheel, values: updatedValues };
-    //             }
-    //             return wheel;
-    //         });
-
-    //         localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-    //         setWheels(updatedWheels);
-    //     } catch (error) {
-    //         console.error("Error updating value:", error);
-    //     }
-    // }, [wheels]);
-
-
-    // const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => {
-    //     console.log("CONTEXT UPDATE", newColor)
-    //     try {
-    //         const updatedWheels = wheels.map(wheel => {
-    //             if (wheel.id === wheel_id) {
-    //                 const updatedValues = wheel.values.map(value =>
-    //                     value.id === value_id
-    //                         ? {
-    //                               ...value,
-    //                               value: newValue ?? value.value,
-    //                               color: newColor ? { ...value.color, ...newColor } : value.color
-    //                           }
-    //                         : value
-    //                 );
-    //                 return { ...wheel, values: updatedValues };
-    //             }
-    //             return wheel;
-    //         });
-
-    //         // Optional: Validate that updatedWheels is of type Wheel[]
-    //         if (updatedWheels.every(w => w.values.every(v => typeof v.value === 'string'))) {
-    //             console.log("Updated Wheels:", updatedWheels); // Log the updated wheels
-    //             localStorage.setItem('wheels', JSON.stringify(updatedWheels));
-    //             setWheels(updatedWheels);
-    //         } else {
-    //             console.error("Invalid wheel data structure");
-    //         }
-    //     } catch (error) {
-    //         console.error("Error updating value:", error);
-    //     }
-    // }, [wheels]);
-
-    const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => {
+    
+    const updateValue = useCallback((wheel_id: string, value_id: string, newValue?: string) => {
         console.log("CONTEXT UPDATE - wheel_id:", wheel_id);
         console.log("CONTEXT UPDATE - value_id:", value_id);
         console.log("CONTEXT UPDATE - newValue:", newValue);
-        console.log("CONTEXT UPDATE - newColor:", newColor);
+        // console.log("CONTEXT UPDATE - newColor:", newColor);
 
         try {
             const updatedWheels = wheels.map(wheel => {
@@ -302,10 +229,10 @@ export const WheelProvider: React.FC<{ children: ReactNode }> = ({ children }) =
                             ? {
                                 ...value,
                                 value: newValue ?? value.value,
-                                color: {
-                                    ...value.color,
-                                    ...(newColor || {}) // Ensure we only spread non-undefined newColor
-                                }
+                                // color: {
+                                //     ...value.color,
+                                //     ...(newColor || {}) // Ensure we only spread non-undefined newColor
+                                // }
                             }
                             : value
                     );
