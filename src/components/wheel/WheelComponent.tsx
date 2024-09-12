@@ -5,6 +5,7 @@ const WheelComponent: FC = () => {
     const { oneWheel, loading, spinAnimationTriggered, landedValues, addLandedValue } = useWheel();
     const reversedValues = [...oneWheel?.values].reverse();
 
+
     const [isSpinning, setIsSpinning] = useState(false);
     const [wheelPos, setWheelPos] = useState(0);
     const [speed, setSpeed] = useState(0);
@@ -19,7 +20,7 @@ const WheelComponent: FC = () => {
 
     const radius: number = 200;
     const strokeColor: string = oneWheel?.strokeColor || '#000000';
-  
+
     const strokeWidth: number = oneWheel?.strokeWidth || 4;
 
     const generateSlicePath = (index: number, total: number): string => {
@@ -47,7 +48,7 @@ const WheelComponent: FC = () => {
         return { x, y, angle: rotation };
     };
 
-  
+
     const calculateImagePosition = (index: number, total: number): { x: number, y: number, width: number, height: number, angle: number } => {
         const angle = (2 * Math.PI) / total;
         const midAngle = index * angle + angle / 2;
@@ -67,7 +68,7 @@ const WheelComponent: FC = () => {
         return { x, y, width: imageSize, height: imageSize, angle: rotation };
     };
 
- 
+
 
 
     const splitByWords = (text: string, maxLength: number): string[] => {
@@ -181,7 +182,7 @@ const WheelComponent: FC = () => {
                     {reversedValues.map((value, i) => {
                         const { x, y, angle } = calculateTextPosition(i, oneWheel.values.length);
                         // const { x: imgX, y: imgY, width, height, angle: imgAngle } = calculateImagePosition(i, oneWheel.values.length);
-                        const chunks = splitByWords(value.value, 25);
+                        const chunks = splitByWords(value.value, value.lineLength);
                         return (
                             <g key={i}>
                                 <path
@@ -203,11 +204,14 @@ const WheelComponent: FC = () => {
                                     <text
                                         key={`${i}-${j}`}
                                         x={x}
-                                        y={y + j * 12}
+                                        y={y + j * (value.lineSpacing || 12)}
                                         transform={`rotate(${angle + 180}, ${x}, ${y})`}
                                         textAnchor="middle"
                                         alignmentBaseline="middle"
-                                        style={{ fontSize: '12px' }}
+                                        style={{
+                                            fontSize: value.fontSize || '12px',
+
+                                        }}
                                         fill={value.color.textColor || '#ffffff'}
                                     >
                                         {chunk}
@@ -217,8 +221,8 @@ const WheelComponent: FC = () => {
                         );
                     })}
                 </g>
-                   {/* Add pointer */}
-                   <polygon 
+                {/* Add pointer */}
+                <polygon
                     points={`${radius - 10},${-10} ${radius + 10},${-10} ${radius},${10}`}
                     fill="red"
                     stroke="black"

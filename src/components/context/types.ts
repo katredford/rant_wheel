@@ -14,6 +14,9 @@ export interface Value {
     wheel_id: string;
     color: Color,
     imgSrc: Image;
+    fontSize: number;
+    lineLength: number;
+    lineSpacing: number;
 
 }
 
