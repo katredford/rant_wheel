@@ -15,13 +15,11 @@ import { Color } from '../context/types'
 interface ValuesControlProps {
     wheel?: Wheel;
     onValueChanged: () => void;
-    onUpdateValue: (wheel_id: string, value_id: string, new_value: string, colors?: Color) => void;
+    onUpdateValue: (wheel_id: string, value_id: string, new_value: string, color?: Color, fontSize?: number, lineLength?: number, lineSpacing?: number) => void;
     deleteValue: (wheel_id: string, value_id: string) => void;
-    updateValue: (wheel_id: string, value_id: string, newValue?: string, newColor?: Color) => void;
-    updateColor: (wheel_id: string, value_id: string, colors: Color) => void;
 }
 
-const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, deleteValue, updateColor}) => {
+const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, deleteValue }) => {
     const [editingValueId, setEditingValueId] = useState<string | null>(null);
     const [editedValue, setEditedValue] = useState<string>('');
     const [values, setValues] = useState<Value[]>([]);
@@ -61,12 +59,10 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
         }
     };
 
-    const handleUpdate = (valueId: string, wheelId: string, colors?: Color) => {
-        const defaultColors = { sliceColor: '#ff0000', textColor: '#000000' };
+    const handleUpdate = (valueId: string, wheelId: string) => {
 
-        const { sliceColor = defaultColors.sliceColor, textColor = defaultColors.textColor } = colors || {};
         if (editedValue.trim() !== '') {
-            onUpdateValue(wheelId, valueId, editedValue, { sliceColor, textColor });
+            onUpdateValue(wheelId, valueId, editedValue);
             setEditingValueId(null);
             setEditedValue('');
 
@@ -77,21 +73,6 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
         }
     };
 
-    // const handleUpdate = (valueId: string, wheelId: string, colors?: keyof Color) => {
-    //     console.log('Received colors:', [colors]);
-    //     // const defaultColors = { sliceColor: '#ff0000', textColor: '#000000' };
-    
-    //     // const { sliceColor = defaultColors.sliceColor, textColor = defaultColors.textColor } = colors || {};
-    //     // if (editedValue.trim() !== '') {
-    //     //     onUpdateValue(wheelId, valueId, editedValue, { sliceColor, textColor });
-    //     //     setEditingValueId(null);
-    //     //     setEditedValue('');
-    //     //     setShowOptions(null);
-    //     //     toast.success('Value updated successfully!');
-    //     // } else {
-    //     //     toast.error('Value field cannot be empty!');
-    //     // }
-    // };
 
     const handleDelete = (wheelId: string, valueId: string) => {
         deleteValue(wheelId, valueId);
@@ -122,123 +103,22 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
     };
 
 
-
     const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: 'sliceColor' | 'textColor') => {
-        const newColor = e.target.value;
-        updateColor(wheelId, valueId, { ...values.find(v => v.id === valueId)!.color, [colorType]: newColor });
+        const newColorValue = e.target.value;
+        // find the current value object by ID
+        const currentValue = values.find(v => v.id === valueId);
+
+        if (currentValue) {
+
+            const updatedColor = {
+                ...currentValue.color,
+                [colorType]: newColorValue
+            };
+
+            // call updateValue to update the color
+            onUpdateValue(wheelId, valueId, currentValue.value, updatedColor);
+        }
     };
-
-    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
-    //     const newColor = e.target.value;
-    //     console.log(newColor, valueId)
-    //     const currentValue = values.find(v => v.id === valueId);
-    //     console.log(currentValue)
-    //     if (currentValue) {
-    //         console.log("UPDATE UPDATE")
-    //         updateValue(wheelId, valueId, currentValue.value, { ...currentValue.color, [colorType]: newColor });
-            
-    //     }
-    // };
-
-    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
-    //     const newColor = e.target.value;
-    //     console.log(newColor, valueId);
-        
-    //     const currentValue = values.find(v => v.id === valueId);
-    //     console.log( "current value ",currentValue);
-    
-    //     if (currentValue) {
-    //         console.log("UPDATE UPDATE");
-    
-    //         // Create a new color object based on the current color and the updated color
-    //         const updatedColor = {
-    //             ...currentValue.color,
-    //             [colorType]: newColor
-    //         };
-
-    //         console.log(currentValue, "CURRENT VALUD")
-    
-    //         // Call updateValue with the new color
-    //         updateValue(wheelId, valueId, currentValue.value, updatedColor);
-    //     }
-    // };
-    
-    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
-    //     const newColor = e.target.value;
-    //     console.log("New Color:", newColor, "Value ID:", valueId);
-    
-    //     // Find the current value based on valueId
-    //     const currentValue = values.find(v => v.id === valueId);
-    //     console.log("Current Value:", currentValue);
-        
-    //     // Log the values array to check its content
-    //     console.log("Values Array:", values);
-    
-    //     if (currentValue) {
-    //         console.log("UPDATE UPDATE");
-    
-    //         // Create a new color object based on the current color and the updated color
-    //         const updatedColor = {
-    //             ...currentValue.color,
-    //             [colorType]: newColor
-    //         };
-    
-    //         console.log("Updated Color:", updatedColor);
-    //         console.log("Current Value Before Update:", currentValue);
-    
-    //         // Call updateValue with the new color
-    //         updateValue(wheelId, valueId, currentValue.value, updatedColor);
-    //     } else {
-    //         console.error("No matching value found for ID:", valueId);
-    //     }
-    // };
-    
-    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
-    //     const newColor = e.target.value;
-    //     console.log("New Color:", newColor, "Value ID:", valueId, "Color Type:", colorType);
-        
-    //     const currentValue = values.find(v => v.id === valueId);
-    //     console.log("Current Value:", currentValue);
-    
-    //     if (currentValue) {
-    //         const updatedColor = {
-    //             ...currentValue.color,
-    //             [colorType]: newColor
-    //         };
-    
-    //         console.log("Updated Color:", updatedColor);
-    //         console.log("Current Value Before Update:", currentValue);
-    
-    //         updateValue(wheelId, valueId, currentValue.value, updatedColor);
-    //     } else {
-    //         console.error("No matching value found for ID:", valueId);
-    //     }
-    // };
-    
-    // const handleColorChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string, colorType: keyof Color) => {
-    //     const newColor = e.target.value;
-    //     console.log("New Color:", newColor, "Value ID:", valueId, "Color Type:", colorType) ;
-        
-    //     const currentValue = values.find(v => v.id === valueId);
-    //     console.log("Current Value:", currentValue);
-        
-    //     if (currentValue) {
-    //         console.log("UPDATE UPDATE", currentValue.color);
-    
-    //         const updatedColor: Color = {
-    //             ...currentValue.color,
-    //             [colorType]: newColor || '#000000'
-    //         };
-    
-    //         console.log("Updated Color:", updatedColor);
-    
-    //         updateValue(wheelId, valueId, currentValue.value, updatedColor);
-    //         // updateValue('hardcodedWheelId', 'hardcodedValueId', 'testValue', { sliceColor: 'rambkl', textColor: 'gamble' });
-    //     } else {
-    //         console.error("No matching value found for ID:", valueId);
-    //     }
-    // };
-    
 
     // const toggleShowOptions = (valueId: string) => {
     //     setShowOptions(prev => (prev === valueId ? null : valueId));
@@ -248,10 +128,50 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
         return <div>No wheel data available</div>;
     }
 
-    // useEffect(() => {
-    //     console.log('Updated values:', values);
-    // }, [values]);
-    
+
+
+    const handleFontChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string) => {
+        const newFontSize = parseInt(e.target.value, 10);
+        console.log('New Font Size:', newFontSize); 
+
+ 
+        if (!isNaN(newFontSize)) {
+            const currentValue = values.find(v => v.id === valueId);
+            if (currentValue) {
+       
+                onUpdateValue(wheelId, valueId, currentValue.value, currentValue.color, newFontSize);
+            }
+        }
+    };
+
+    const handleLineChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string) => {
+        const newLineLength = parseInt(e.target.value, 10);
+
+
+ 
+        if (!isNaN(newLineLength)) {
+            const currentValue = values.find(v => v.id === valueId);
+            if (currentValue) {
+
+                onUpdateValue(wheelId, valueId, currentValue.value, currentValue.color, undefined, newLineLength);
+            }
+        }
+    };
+
+    const handleSpaceChange = (e: React.ChangeEvent<HTMLInputElement>, valueId: string, wheelId: string) => {
+        const newLineSpacing = parseInt(e.target.value, 10);
+
+        console.log('New line space:', newLineSpacing);
+
+        if (!isNaN(newLineSpacing)) {
+            const currentValue = values.find(v => v.id === valueId);
+            if (currentValue) {
+        
+                onUpdateValue(wheelId, valueId, currentValue.value, currentValue.color, undefined, undefined, newLineSpacing);
+            }
+        }
+    };
+
 
     return (
         <>
@@ -286,11 +206,6 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
                                                     <button
                                                         className="px-5 py-2 text-sm font-normal text-orange-300 bg-orange-900 border-2 border-orange-900 active:scale-95 rounded-xl"
                                                         onClick={() => handleUpdate(valObj.id, valObj.wheel_id,
-                                                            // valObj.color.sliceColor || '#ff0000'
-                                                            // {
-                                                            //     sliceColor: valObj.color.sliceColor || '#ff0000',
-                                                            //     textColor: valObj.color.textColor || '#000000'
-                                                            // }
                                                         )}
                                                     >
                                                         Save
@@ -344,6 +259,34 @@ const ValuesControl: React.FC<ValuesControlProps> = ({ wheel, onUpdateValue, del
                                                                             />
                                                                             <span className='color mirror' aria-hidden="true" />
                                                                         </label>
+
+                                                                        <label>
+                                                                            Font Size:
+                                                                            <input
+                                                                                type="number"
+                                                                                value={valObj.fontSize || 14}
+                                                                                onChange={(e) => handleFontChange(e, valObj.id, valObj.wheel_id)}
+                                                                            />
+                                                                        </label>
+
+                                                                        <label>
+                                                                            Characters per line:
+                                                                            <input
+                                                                                type="number"
+                                                                                value={valObj.lineLength !== undefined ? valObj.lineLength : 25}
+                                                                                onChange={(e) => handleLineChange(e, valObj.id, valObj.wheel_id)}
+                                                                            />
+                                                                        </label>
+
+                                                                        <label>
+                                                                            Line Spacing:
+                                                                            <input
+                                                                                type="number"
+                                                                                value={valObj.lineSpacing !== undefined ? valObj.lineSpacing : 12}
+                                                                                onChange={(e) => handleSpaceChange(e, valObj.id, valObj.wheel_id)}
+                                                                            />
+                                                                        </label>
+
                                                                     </div>
                                                                 </>
                                                             ) : (

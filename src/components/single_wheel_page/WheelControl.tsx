@@ -33,7 +33,7 @@ const WheelControl: React.FC = () => {
         landedValues, 
         clearLandedValues, 
         refreshTrigger,
-        updateColor
+     
     } = useWheel();
 
     const [isPortalOpen, setIsPortalOpen] = useState(false);
@@ -54,8 +54,6 @@ const WheelControl: React.FC = () => {
   
     useEffect(() => {
         // This effect will run whenever refreshTrigger changes
-     
-    
         getOneWheel(String(id));
     }, [refreshTrigger, id, getOneWheel]);
 
@@ -215,19 +213,15 @@ const WheelControl: React.FC = () => {
                 <>
                     <ValuesControl
                         wheel={oneWheel}
-                        onUpdateValue={(wheelId, valueId, value, color) => {
-                            updateValue(wheelId, valueId, value, color);
+                        onUpdateValue={(wheelId, valueId, value, color, fontSize, lineLength, lineSpacing) => {
+                            updateValue(wheelId, valueId, value, color, fontSize, lineLength, lineSpacing);
                             refreshWheelData();
                         }}
                         onValueChanged={refreshWheelData}
                         deleteValue={(wheelId, valueId) => {
                             deleteValue(wheelId, valueId).then(refreshWheelData);
                         }}
-                        // updateColor={updateColor}
-                        updateColor={(wheelId, valueId, newColor) => {
-                            updateColor(wheelId, valueId, newColor);
-                            refreshWheelData();
-                        }}
+                    
                     />
 
                     <button onClick={triggerSpinAnimation} disabled={isTriggerDisabled}>
